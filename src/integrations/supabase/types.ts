@@ -14,16 +14,294 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          incident_id: string
+          recipient: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          id?: string
+          incident_id: string
+          recipient: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          incident_id?: string
+          recipient?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          priority: number
+          relationship: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          priority?: number
+          relationship?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          priority?: number
+          relationship?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hospitals: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          emergency_24x7: boolean | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          emergency_24x7?: boolean | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          emergency_24x7?: boolean | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          notes: string | null
+          resolved_at: string | null
+          responder_id: string | null
+          status: Database["public"]["Enums"]["incident_status"]
+          type: Database["public"]["Enums"]["incident_type"]
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          resolved_at?: string | null
+          responder_id?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          type?: Database["public"]["Enums"]["incident_type"]
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          resolved_at?: string | null
+          responder_id?: string | null
+          status?: Database["public"]["Enums"]["incident_status"]
+          type?: Database["public"]["Enums"]["incident_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      location_logs: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          id: string
+          incident_id: string | null
+          latitude: number
+          longitude: number
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          id?: string
+          incident_id?: string | null
+          latitude: number
+          longitude: number
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          id?: string
+          incident_id?: string | null
+          latitude?: number
+          longitude?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_logs_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      police_stations: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          blood_group: string | null
+          created_at: string
+          emergency_message: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          blood_group?: string | null
+          created_at?: string
+          emergency_message?: string | null
+          full_name: string
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blood_group?: string | null
+          created_at?: string
+          emergency_message?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin" | "police" | "hospital"
+      incident_status: "active" | "responded" | "resolved" | "false_alarm"
+      incident_type: "sos" | "voice" | "manual" | "auto_detected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +428,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin", "police", "hospital"],
+      incident_status: ["active", "responded", "resolved", "false_alarm"],
+      incident_type: ["sos", "voice", "manual", "auto_detected"],
+    },
   },
 } as const
