@@ -1,16 +1,114 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Link } from "react-router-dom";
+import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const features = [
+  { icon: Zap, title: "One-Tap SOS", desc: "Instantly alert your trusted circle with a single press." },
+  { icon: MapPin, title: "Live GPS Sharing", desc: "Real-time location streamed to family and authorities." },
+  { icon: Mic, title: "Voice Activation", desc: "Say \"Help Me\" and Jeevan Raksha takes action." },
+  { icon: Bell, title: "Multi-Channel Alerts", desc: "Notifications via app, email, and push." },
+  { icon: Users, title: "Trusted Contacts", desc: "Manage who gets alerted in an emergency." },
+  { icon: Shield, title: "Police & Hospital Network", desc: "Direct routing to nearest verified responders." },
+];
+
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+        <div className="container flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-emergency flex items-center justify-center shadow-emergency">
+              <Shield className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg tracking-tight">Jeevan Raksha</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/auth"><Button variant="ghost" size="sm">Login</Button></Link>
+            <Link to="/auth?mode=signup"><Button size="sm" className="bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-hero opacity-10" />
+        <div className="container relative py-16 md:py-24">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
+              <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
+            </div>
+            <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.05]">
+              Safety in <span className="bg-gradient-emergency bg-clip-text text-transparent">one tap.</span>
+              <br />
+              Help in <span className="bg-gradient-trust bg-clip-text text-transparent">seconds.</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+              Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              <Link to="/auth?mode=signup">
+                <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
+                  <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
+                </Button>
+              </Link>
+              <Link to="/auth">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8">Sign In</Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Pulsing SOS preview */}
+          <div className="flex justify-center mt-16">
+            <div className="relative">
+              <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
+                <div className="text-center text-primary-foreground">
+                  <Shield className="w-10 h-10 mx-auto mb-2" />
+                  <div className="text-3xl font-extrabold tracking-wider">SOS</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Built for emergencies that can't wait</h2>
+          <p className="text-muted-foreground">Every feature designed to reach help fast.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((f) => (
+            <div key={f.title} className="p-6 rounded-2xl bg-gradient-card border border-border shadow-card hover:shadow-elevated transition-all hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-4">
+                <f.icon className="w-6 h-6 text-secondary" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">{f.title}</h3>
+              <p className="text-sm text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container pb-20">
+        <div className="rounded-3xl bg-gradient-trust p-8 md:p-12 text-center shadow-trust">
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-3">Your safety, our promise.</h2>
+          <p className="text-secondary-foreground/90 mb-6 max-w-xl mx-auto">Join thousands of women using Jeevan Raksha to stay protected, every day, everywhere.</p>
+          <Link to="/auth?mode=signup">
+            <Button size="lg" variant="secondary" className="h-12 px-8 bg-background text-foreground hover:bg-background/90">
+              Create Free Account
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+        © 2026 Jeevan Raksha · Protecting women, one tap at a time.
+      </footer>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
