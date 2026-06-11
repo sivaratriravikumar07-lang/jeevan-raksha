@@ -1,0 +1,164 @@
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AlertTriangle, MapPin, Phone, X, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { startSiren, stopSiren, vibrate, getCurrentPosition, watchPosition, clearWatch } from "@/lib/emergency";
+
+const Emergency = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [incidentId, setIncidentId] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number; acc: number } | null>(null);
+  const [countdown, setCountdown] = useState(15);
+  const [sirenOn, setSirenOn] = useState(true);
+  const [contactCount, setContactCount] = useState(0);
+  const watchRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    vibrate([300, 100, 300, 100, 600]);
+    startSiren();
+
+    (async () => {
+      let lat = 0, lng = 0, acc: number | null = null;
+      try {
+        const pos = await getCurrentPosition();
+        lat = pos.coords.latitude; lng = pos.coords.longitude; acc = pos.coords.accuracy;
+        if (!cancelled) setCoords({ lat, lng, acc: acc ?? 0 });
+      } catch {
+        toast.error("Could not access location — please enable GPS.");
+      }
+
+      // Create incident
+      const { data: incident, error } = await supabase.from("incidents").insert({
+        user_id: user.id, type: "sos", status: "active",
+        latitude: lat || null, longitude: lng || null,
+      }).select().single();
+      if (error || !incident) { toast.error("Failed to log incident"); return; }
+      if (cancelled) return;
+      setIncidentId(incident.id);
+
+      // Initial location log + notify contacts
+      if (lat && lng) {
+        await supabase.from("location_logs").insert({ user_id: user.id, incident_id: incident.id, latitude: lat, longitude: lng, accuracy: acc });
+      }
+      const { data: contacts } = await supabase.from("emergency_contacts").select("name, phone, email").eq("user_id", user.id);
+      setContactCount(contacts?.length ?? 0);
+      if (contacts?.length) {
+        const rows = contacts.map((c) => ({
+          incident_id: incident.id, user_id: user.id, channel: "in_app", recipient: c.phone, status: "sent",
+        }));
+        await supabase.from("alerts").insert(rows);
+        toast.success(`Alert sent to ${contacts.length} trusted contact${contacts.length > 1 ? "s" : ""}`);
+      } else {
+        toast.warning("No trusted contacts set. Add some after this emergency.");
+      }
+
+      // Start live location tracking
+      watchRef.current = watchPosition((p) => {
+        setCoords({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy });
+        supabase.from("location_logs").insert({
+          user_id: user.id, incident_id: incident.id,
+          latitude: p.coords.latitude, longitude: p.coords.longitude, accuracy: p.coords.accuracy,
+        });
+      });
+    })();
+
+    // 15-second countdown to emergency call
+    timerRef.current = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          window.location.href = "tel:112";
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+
+    return () => {
+      cancelled = true;
+      stopSiren();
+      if (watchRef.current !== null) clearWatch(watchRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const toggleSiren = () => {
+    if (sirenOn) { stopSiren(); setSirenOn(false); }
+    else { startSiren(); setSirenOn(true); }
+  };
+
+  const cancel = async () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    stopSiren();
+    if (watchRef.current !== null) clearWatch(watchRef.current);
+    if (incidentId) {
+      await supabase.from("incidents").update({ status: "false_alarm", resolved_at: new Date().toISOString() }).eq("id", incidentId);
+    }
+    toast.success("Emergency cancelled. You're safe.");
+    navigate("/dashboard");
+  };
+
+  return (
+    <div className="min-h-screen animate-siren text-primary-foreground flex flex-col">
+      <header className="container py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5" />
+          <span className="font-bold uppercase tracking-wider text-sm">Emergency Active</span>
+        </div>
+        <Button variant="ghost" size="icon" onClick={toggleSiren} className="text-primary-foreground hover:bg-background/20">
+          {sirenOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </Button>
+      </header>
+
+      <main className="flex-1 container flex flex-col items-center justify-center text-center space-y-6 py-8">
+        <div className="bg-background/20 backdrop-blur-sm rounded-full w-32 h-32 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-5xl font-extrabold">{countdown}</div>
+            <div className="text-xs opacity-90">sec</div>
+          </div>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold mb-1">Calling 112 in {countdown}s</h1>
+          <p className="text-sm opacity-90 max-w-xs">Your location is being shared with {contactCount} contact{contactCount === 1 ? "" : "s"} in real time.</p>
+        </div>
+
+        {coords && (
+          <div className="bg-background/15 backdrop-blur-sm rounded-2xl p-4 w-full max-w-sm">
+            <div className="flex items-center gap-2 justify-center mb-1">
+              <MapPin className="w-4 h-4" />
+              <span className="text-xs font-semibold uppercase tracking-wider">Live location</span>
+            </div>
+            <div className="text-sm font-mono">{coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}</div>
+            <div className="text-xs opacity-80 mt-1">Accuracy ~ {Math.round(coords.acc)}m</div>
+            <a
+              href={`https://www.google.com/maps?q=${coords.lat},${coords.lng}`}
+              target="_blank" rel="noreferrer"
+              className="inline-block mt-3 text-xs underline"
+            >Open in Maps →</a>
+          </div>
+        )}
+      </main>
+
+      <footer className="container py-6 space-y-3">
+        <a href="tel:112" className="block">
+          <Button size="lg" variant="secondary" className="w-full h-14 bg-background text-foreground hover:bg-background/90 font-bold">
+            <Phone className="w-5 h-5 mr-2" /> Call 112 Now
+          </Button>
+        </a>
+        <Button onClick={cancel} variant="ghost" className="w-full h-12 text-primary-foreground hover:bg-background/20 border border-primary-foreground/30">
+          <X className="w-4 h-4 mr-2" /> I'm Safe — Cancel
+        </Button>
+      </footer>
+    </div>
+  );
+};
+
+export default Emergency;
