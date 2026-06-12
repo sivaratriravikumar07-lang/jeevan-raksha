@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { startSiren, stopSiren, vibrate, getCurrentPosition, watchPosition, clearWatch } from "@/lib/emergency";
+import { AudioRecorder } from "@/components/AudioRecorder";
 
 const Emergency = () => {
   const { user } = useAuth();
