@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Shield, AlertTriangle, Users, MapPin, History, LogOut, Phone, Hospital, Mic } from "lucide-react";
+import { Shield, AlertTriangle, Users, MapPin, History, LogOut, Phone, Hospital, Mic, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { VoiceActivation } from "@/components/VoiceActivation";
 
 interface Profile { full_name: string; phone: string | null; }
 interface Stats { contacts: number; incidents: number; }
