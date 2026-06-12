@@ -90,6 +90,9 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Voice SOS */}
+        <VoiceActivation onTrigger={() => navigate("/emergency")} />
+
         {/* Quick actions */}
         <div className="space-y-2">
           <Link to="/contacts" className="flex items-center gap-4 p-4 bg-card border border-border rounded-2xl shadow-card hover:shadow-elevated transition">
@@ -117,6 +120,15 @@ const Dashboard = () => {
             <div className="flex-1">
               <div className="font-semibold">Incident History</div>
               <div className="text-xs text-muted-foreground">Past alerts & evidence</div>
+            </div>
+          </Link>
+          <Link to="/fake-call" className="flex items-center gap-4 p-4 bg-card border border-border rounded-2xl shadow-card hover:shadow-elevated transition">
+            <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center">
+              <PhoneCall className="w-5 h-5 text-secondary" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold">Fake Call</div>
+              <div className="text-xs text-muted-foreground">Simulate an incoming call</div>
             </div>
           </Link>
           <a href="tel:112" className="flex items-center gap-4 p-4 bg-gradient-emergency rounded-2xl shadow-emergency text-primary-foreground">
