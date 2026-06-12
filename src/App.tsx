@@ -13,6 +13,7 @@ import Contacts from "./pages/Contacts";
 import Nearby from "./pages/Nearby";
 import History from "./pages/History";
 import Responder from "./pages/Responder";
+import FakeCall from "./pages/FakeCall";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/nearby" element={<ProtectedRoute><Nearby /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             <Route path="/responder" element={<ProtectedRoute><Responder /></ProtectedRoute>} />
+            <Route path="/fake-call" element={<ProtectedRoute><FakeCall /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
