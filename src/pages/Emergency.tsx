@@ -146,6 +146,16 @@ const Emergency = () => {
             >Open in Maps →</a>
           </div>
         )}
+
+        {user && incidentId && (
+          <div className="bg-background/15 backdrop-blur-sm rounded-2xl p-4 w-full max-w-sm text-center">
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3">Evidence Recorder</p>
+            <div className="flex justify-center">
+              <AudioRecorder incidentId={incidentId} userId={user.id} />
+            </div>
+            <p className="text-[10px] opacity-70 mt-3">Record audio evidence securely to the cloud.</p>
+          </div>
+        )}
       </main>
 
       <footer className="container py-6 space-y-3">
