@@ -13,6 +13,7 @@ import Contacts from "./pages/Contacts";
 import Nearby from "./pages/Nearby";
 import History from "./pages/History";
 import Responder from "./pages/Responder";
+import FakeCall from "./pages/FakeCall";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
