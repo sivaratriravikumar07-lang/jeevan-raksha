@@ -75,7 +75,7 @@ const Emergency = () => {
       setCountdown((c) => {
         if (c <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
-          window.location.href = "tel:112";
+          window.location.href = "tel:100";
           return 0;
         }
         return c - 1;
@@ -127,7 +127,7 @@ const Emergency = () => {
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold mb-1">Calling 112 in {countdown}s</h1>
+          <h1 className="text-2xl font-bold mb-1">Calling Police 100 in {countdown}s</h1>
           <p className="text-sm opacity-90 max-w-xs">Your location is being shared with {contactCount} contact{contactCount === 1 ? "" : "s"} in real time.</p>
         </div>
 
@@ -159,9 +159,9 @@ const Emergency = () => {
       </main>
 
       <footer className="container py-6 space-y-3">
-        <a href="tel:112" className="block">
+        <a href="tel:100" className="block">
           <Button size="lg" variant="secondary" className="w-full h-14 bg-background text-foreground hover:bg-background/90 font-bold">
-            <Phone className="w-5 h-5 mr-2" /> Call 112 Now
+            <Phone className="w-5 h-5 mr-2" /> Call Police 100 Now
           </Button>
         </a>
         <Button onClick={cancel} variant="ghost" className="w-full h-12 text-primary-foreground hover:bg-background/20 border border-primary-foreground/30">
