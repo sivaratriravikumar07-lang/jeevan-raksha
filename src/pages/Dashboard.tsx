@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Shield, AlertTriangle, Users, MapPin, History as HistoryIcon, LogOut,
-  Phone, Hospital, PhoneCall, Plus, Trash2, Home, Activity,
+  Shield, AlertTriangle, Users, History as HistoryIcon, LogOut,
+  Phone, Hospital, PhoneCall, Plus, Trash2, Activity,
+  MapPin,
 } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,6 @@ import { vibrate } from "@/lib/emergency";
 interface Profile { full_name: string; phone: string | null; }
 interface Contact { id: string; name: string; phone: string; email: string | null; relationship: string | null; }
 interface Incident { id: string; type: string; status: string; latitude: number | null; longitude: number | null; created_at: string; }
-interface Place { id: string; name: string; address: string | null; phone: string | null; latitude: number | null; longitude: number | null; }
 
 const contactSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -42,8 +42,6 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
-  const [stations, setStations] = useState<Place[]>([]);
-  const [hospitals, setHospitals] = useState<Place[]>([]);
   const [showFake, setShowFake] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", relationship: "" });
@@ -54,18 +52,14 @@ const Dashboard = () => {
 
   const loadAll = async () => {
     if (!user) return;
-    const [p, c, i, s, h] = await Promise.all([
+    const [p, c, i] = await Promise.all([
       supabase.from("profiles").select("full_name, phone").eq("id", user.id).maybeSingle(),
       supabase.from("emergency_contacts").select("*").eq("user_id", user.id).order("priority"),
       supabase.from("incidents").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-      supabase.from("police_stations").select("*"),
-      supabase.from("hospitals").select("*"),
     ]);
     setProfile(p.data);
     setContacts(c.data ?? []);
     setIncidents(i.data ?? []);
-    setStations(s.data ?? []);
-    setHospitals(h.data ?? []);
   };
 
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [user]);
@@ -171,9 +165,9 @@ const Dashboard = () => {
             <div className="text-[10px] text-muted-foreground">Incidents</div>
           </div>
           <div className="p-3 bg-card border border-border rounded-2xl shadow-card text-center">
-            <Hospital className="w-4 h-4 text-secondary mx-auto mb-1" />
-            <div className="text-xl font-bold">{stations.length + hospitals.length}</div>
-            <div className="text-[10px] text-muted-foreground">Nearby help</div>
+            <MapPin className="w-4 h-4 text-secondary mx-auto mb-1" />
+            <div className="text-xl font-bold">2</div>
+            <div className="text-[10px] text-muted-foreground">Pages</div>
           </div>
         </div>
 
@@ -198,11 +192,38 @@ const Dashboard = () => {
         {/* Voice SOS */}
         <VoiceActivation onTrigger={() => navigate("/emergency")} />
 
-        {/* All-in-one tabs */}
+        {/* Separate page links for Nearby */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => navigate("/police-stations")}
+            className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <div className="font-semibold text-sm">Police Stations</div>
+              <div className="text-xs text-muted-foreground">Vijayawada</div>
+            </div>
+          </button>
+          <button
+            onClick={() => navigate("/hospitals")}
+            className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0">
+              <Hospital className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <div className="font-semibold text-sm">Hospitals</div>
+              <div className="text-xs text-muted-foreground">Vijayawada</div>
+            </div>
+          </button>
+        </div>
+
+        {/* Tabs: Contacts & History */}
         <Tabs defaultValue="contacts" className="w-full">
-          <TabsList className="grid grid-cols-3 w-full">
+          <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
-            <TabsTrigger value="nearby">Nearby</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
 
@@ -247,50 +268,6 @@ const Dashboard = () => {
                 </form>
               </DialogContent>
             </Dialog>
-          </TabsContent>
-
-          {/* Nearby */}
-          <TabsContent value="nearby" className="space-y-4 mt-3">
-            <section>
-              <h3 className="font-bold mb-2 flex items-center gap-2 text-sm"><Shield className="w-4 h-4 text-primary" /> Police Stations</h3>
-              <div className="space-y-2">
-                {stations.length === 0 && <p className="text-xs text-muted-foreground">No stations listed.</p>}
-                {stations.map((p) => (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-3 shadow-card">
-                    <div className="font-semibold text-sm">{p.name}</div>
-                    <div className="text-xs text-muted-foreground">{p.address}</div>
-                    <div className="flex gap-3 mt-2">
-                      {p.phone && <a href={`tel:${p.phone}`} className="text-xs font-medium text-secondary inline-flex items-center gap-1"><Phone className="w-3 h-3" /> Call</a>}
-                      {p.latitude && p.longitude && (
-                        <a href={`https://www.google.com/maps?q=${p.latitude},${p.longitude}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-secondary inline-flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> Directions
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-            <section>
-              <h3 className="font-bold mb-2 flex items-center gap-2 text-sm"><Hospital className="w-4 h-4 text-secondary" /> Hospitals</h3>
-              <div className="space-y-2">
-                {hospitals.length === 0 && <p className="text-xs text-muted-foreground">No hospitals listed.</p>}
-                {hospitals.map((p) => (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-3 shadow-card">
-                    <div className="font-semibold text-sm">{p.name}</div>
-                    <div className="text-xs text-muted-foreground">{p.address}</div>
-                    <div className="flex gap-3 mt-2">
-                      {p.phone && <a href={`tel:${p.phone}`} className="text-xs font-medium text-secondary inline-flex items-center gap-1"><Phone className="w-3 h-3" /> Call</a>}
-                      {p.latitude && p.longitude && (
-                        <a href={`https://www.google.com/maps?q=${p.latitude},${p.longitude}`} target="_blank" rel="noreferrer" className="text-xs font-medium text-secondary inline-flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> Directions
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
           </TabsContent>
 
           {/* History */}
