@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { BottomNav } from "@/components/BottomNav";
 
 interface Contact { id: string; name: string; phone: string; email: string | null; relationship: string | null; }
 
@@ -108,6 +109,7 @@ const Contacts = () => {
           </DialogContent>
         </Dialog>
       </main>
+      <BottomNav />
     </div>
   );
 };

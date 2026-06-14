@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, History as HistoryIcon, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BottomNav } from "@/components/BottomNav";
 
 interface Incident { id: string; type: string; status: string; latitude: number | null; longitude: number | null; created_at: string; resolved_at: string | null; }
 
@@ -62,6 +63,7 @@ const History = () => {
           </div>
         ))}
       </main>
+      <BottomNav />
     </div>
   );
 };
