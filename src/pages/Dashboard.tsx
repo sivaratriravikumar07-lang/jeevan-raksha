@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Shield, AlertTriangle, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
+  Share2, Navigation, Heart, WifiOff, Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -156,6 +157,33 @@ const Dashboard = () => {
             </div>
           </button>
         </div>
+
+        {/* New advanced features */}
+        <section>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">More protection</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={() => navigate("/share-location")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><Share2 className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Live Share</div><div className="text-xs text-muted-foreground">1-hour link</div></div>
+            </button>
+            <button onClick={() => navigate("/journey")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><Navigation className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Safe Journey</div><div className="text-xs text-muted-foreground">Route + ETA</div></div>
+            </button>
+            <button onClick={() => navigate("/women-safety")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><Heart className="w-5 h-5 text-primary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Women Mode</div><div className="text-xs text-muted-foreground">1091 · Disha</div></div>
+            </button>
+            <button onClick={() => navigate("/offline-sos")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><WifiOff className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Offline SOS</div><div className="text-xs text-muted-foreground">No internet</div></div>
+            </button>
+            <button onClick={() => navigate("/evidence")} className="col-span-2 flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><Camera className="w-5 h-5 text-primary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Evidence Capture</div><div className="text-xs text-muted-foreground">Photo + 15s video → private cloud vault</div></div>
+            </button>
+          </div>
+        </section>
 
         <button
           onClick={() => navigate("/contacts")}

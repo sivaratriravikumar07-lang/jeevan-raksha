@@ -18,6 +18,12 @@ import PoliceStations from "./pages/PoliceStations";
 import Hospitals from "./pages/Hospitals";
 import Profile from "./pages/Profile";
 import SafetyTips from "./pages/SafetyTips";
+import ShareLocation from "./pages/ShareLocation";
+import TrackLocation from "./pages/TrackLocation";
+import Journey from "./pages/Journey";
+import WomenSafety from "./pages/WomenSafety";
+import OfflineSOS from "./pages/OfflineSOS";
+import Evidence from "./pages/Evidence";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +49,12 @@ const App = () => (
             <Route path="/hospitals" element={<ProtectedRoute><Hospitals /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/safety-tips" element={<ProtectedRoute><SafetyTips /></ProtectedRoute>} />
+            <Route path="/share-location" element={<ProtectedRoute><ShareLocation /></ProtectedRoute>} />
+            <Route path="/track/:token" element={<TrackLocation />} />
+            <Route path="/journey" element={<ProtectedRoute><Journey /></ProtectedRoute>} />
+            <Route path="/women-safety" element={<ProtectedRoute><WomenSafety /></ProtectedRoute>} />
+            <Route path="/offline-sos" element={<ProtectedRoute><OfflineSOS /></ProtectedRoute>} />
+            <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
