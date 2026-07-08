@@ -60,9 +60,12 @@ const Dashboard = () => {
               </div>
               <span className="font-bold">Jeevan Raksha</span>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-secondary-foreground hover:bg-background/20">
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-secondary-foreground hover:bg-background/20">
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <div>
             <p className="text-sm opacity-80">Hi {profile?.full_name?.split(" ")[0] ?? "there"} 👋</p>
