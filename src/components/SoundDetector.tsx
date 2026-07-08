@@ -67,8 +67,9 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
       };
       tick();
       toast.success("Sound shield ON — mic is listening for crashes/screams.");
-    } catch {
-      toast.error("Mic permission denied. Cannot enable sound shield.");
+    } catch (err: any) {
+      console.log("Sound shield mic error:", err);
+      toast.error(`Mic permission denied: ${err?.message || "cannot enable sound shield"}. Open in browser tab & allow mic.`);
       setEnabled(false);
     }
   };
