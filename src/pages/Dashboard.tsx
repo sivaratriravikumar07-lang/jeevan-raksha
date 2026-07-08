@@ -13,6 +13,8 @@ import { VoiceActivation } from "@/components/VoiceActivation";
 import { FakeCall } from "@/components/FakeCall";
 import { SoundDetector } from "@/components/SoundDetector";
 import { BottomNav } from "@/components/BottomNav";
+import { SOSButton } from "@/components/SOSButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface Profile { full_name: string; phone: string | null; }
 interface Contact { id: string }
