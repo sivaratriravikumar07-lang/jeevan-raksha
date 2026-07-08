@@ -9,7 +9,7 @@ interface Props { onDetect: () => void; threshold?: number }
  * Listens to the mic and triggers `onDetect` when a sustained loud sound (crash / scream)
  * is detected. Uses Web Audio AnalyserNode (no recording / upload).
  */
-export const SoundDetector = ({ onDetect, threshold = 0.55 }: Props) => {
+export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
   const [enabled, setEnabled] = useState(false);
   const [level, setLevel] = useState(0);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -67,8 +67,9 @@ export const SoundDetector = ({ onDetect, threshold = 0.55 }: Props) => {
       };
       tick();
       toast.success("Sound shield ON — mic is listening for crashes/screams.");
-    } catch {
-      toast.error("Mic permission denied. Cannot enable sound shield.");
+    } catch (err: any) {
+      console.log("Sound shield mic error:", err);
+      toast.error(`Mic permission denied: ${err?.message || "cannot enable sound shield"}. Open in browser tab & allow mic.`);
       setEnabled(false);
     }
   };
