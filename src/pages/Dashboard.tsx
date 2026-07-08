@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Shield, AlertTriangle, Users, LogOut,
+  Shield, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
   Share2, Navigation, Heart, WifiOff, Camera,
 } from "lucide-react";
