@@ -9,7 +9,7 @@ interface Props { onDetect: () => void; threshold?: number }
  * Listens to the mic and triggers `onDetect` when a sustained loud sound (crash / scream)
  * is detected. Uses Web Audio AnalyserNode (no recording / upload).
  */
-export const SoundDetector = ({ onDetect, threshold = 0.55 }: Props) => {
+export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
   const [enabled, setEnabled] = useState(false);
   const [level, setLevel] = useState(0);
   const ctxRef = useRef<AudioContext | null>(null);
