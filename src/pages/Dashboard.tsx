@@ -79,17 +79,8 @@ const Dashboard = () => {
         {/* SOS Card */}
         <div className="bg-card border border-border rounded-3xl p-6 shadow-elevated text-center">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Emergency SOS · Police 100</p>
-          <button
-            onClick={() => navigate("/emergency")}
-            className="relative w-44 h-44 rounded-full bg-gradient-emergency shadow-emergency mx-auto animate-sos-pulse active:scale-95 transition-transform"
-          >
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-primary-foreground">
-              <AlertTriangle className="w-10 h-10 mb-1" />
-              <span className="text-3xl font-extrabold tracking-wider">SOS</span>
-              <span className="text-xs opacity-90 mt-0.5">Tap to alert</span>
-            </div>
-          </button>
-          <p className="text-xs text-muted-foreground mt-4">Voice "Help Me" · Sound Shield · Tap button — all trigger SOS.</p>
+          <SOSButton onTrigger={() => navigate("/emergency")} holdSeconds={5} />
+          <p className="text-xs text-muted-foreground mt-4">5-sec confirm prevents fake SOS. Voice, Sound Shield, tap — all trigger alert.</p>
         </div>
 
         {/* Quick stats */}
