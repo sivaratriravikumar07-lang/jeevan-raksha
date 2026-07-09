@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Shield, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
-  Share2, Navigation, Heart, WifiOff, Camera,
+  Share2, Navigation, Heart, WifiOff, Camera, Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -125,6 +125,20 @@ const Dashboard = () => {
 
         {/* Voice SOS */}
         <VoiceActivation onTrigger={() => navigate("/emergency")} />
+
+        <button
+          onClick={() => navigate("/mic-test")}
+          className="w-full flex items-center justify-between p-4 bg-accent/40 border border-accent rounded-2xl text-left hover:border-secondary/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Mic className="w-5 h-5 text-secondary" />
+            <div>
+              <div className="font-semibold text-sm">Mic Permission Test</div>
+              <div className="text-xs text-muted-foreground">Verify before using Voice SOS</div>
+            </div>
+          </div>
+          <span className="text-xs text-secondary font-semibold">Check →</span>
+        </button>
 
         {/* Nearby */}
         <div className="grid grid-cols-2 gap-3">

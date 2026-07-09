@@ -24,6 +24,7 @@ import Journey from "./pages/Journey";
 import WomenSafety from "./pages/WomenSafety";
 import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
+import MicTest from "./pages/MicTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/women-safety" element={<ProtectedRoute><WomenSafety /></ProtectedRoute>} />
             <Route path="/offline-sos" element={<ProtectedRoute><OfflineSOS /></ProtectedRoute>} />
             <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+            <Route path="/mic-test" element={<ProtectedRoute><MicTest /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
