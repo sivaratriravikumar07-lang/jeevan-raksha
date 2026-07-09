@@ -13,16 +13,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { BottomNav } from "@/components/BottomNav";
 import { toast } from "sonner";
-
-type PermissionState = "prompt" | "granted" | "denied" | "unknown";
+import {
+  getMicAccessErrorMessage,
+  getMicPermissionStatus,
+  getSpeechRecognitionCtor,
+  isEmbeddedFrame,
+  MicPermissionStatus,
+  openCurrentPageInFullTab,
+  requestMicrophoneStream,
+  watchMicPermission,
+} from "@/lib/microphone";
 
 const MicTest = () => {
-  const [permission, setPermission] = useState<PermissionState>("unknown");
+  const [permission, setPermission] = useState<MicPermissionStatus>("unknown");
   const [speechSupported, setSpeechSupported] = useState<boolean | null>(null);
   const [testing, setTesting] = useState(false);
   const [level, setLevel] = useState(0);
   const [peak, setPeak] = useState(0);
   const [lastSpoken, setLastSpoken] = useState("");
+  const [lastError, setLastError] = useState("");
 
   const streamRef = useRef<MediaStream | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -31,24 +40,15 @@ const MicTest = () => {
 
   // Read the persistent mic permission state from the browser.
   const queryPermission = useCallback(async () => {
-    try {
-      if (typeof navigator === "undefined" || !navigator.permissions) {
-        setPermission("unknown");
-        return;
-      }
-      const result = await navigator.permissions.query({ name: "microphone" as any });
-      setPermission(result.state as PermissionState);
-      result.addEventListener("change", () => setPermission(result.state as PermissionState));
-    } catch {
-      setPermission("unknown");
-    }
+    setPermission(await getMicPermissionStatus());
   }, []);
 
   useEffect(() => {
     queryPermission();
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const cleanup = watchMicPermission(setPermission);
+    const SpeechRecognition = getSpeechRecognitionCtor();
     setSpeechSupported(!!SpeechRecognition);
+    return cleanup;
   }, [queryPermission]);
 
   const stopAudio = useCallback(() => {
@@ -71,9 +71,10 @@ const MicTest = () => {
 
   const startAudioMeter = useCallback(async () => {
     stopAudio();
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await requestMicrophoneStream();
     streamRef.current = stream;
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (ctx.state === "suspended") await ctx.resume();
     ctxRef.current = ctx;
     const src = ctx.createMediaStreamSource(stream);
     const analyser = ctx.createAnalyser();
@@ -94,8 +95,7 @@ const MicTest = () => {
   }, [stopAudio]);
 
   const startSpeechTest = useCallback(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = getSpeechRecognitionCtor();
     if (!SpeechRecognition) return;
     stopSpeech();
     const recognition = new SpeechRecognition();
@@ -127,6 +127,7 @@ const MicTest = () => {
     setTesting(true);
     setPeak(0);
     setLastSpoken("");
+    setLastError("");
     try {
       await startAudioMeter();
       await queryPermission();
@@ -134,12 +135,10 @@ const MicTest = () => {
       if (speechSupported) startSpeechTest();
     } catch (err: any) {
       console.error("Mic test failed:", err);
+      const message = getMicAccessErrorMessage(err);
+      setLastError(message);
       await queryPermission();
-      if (err?.name === "NotAllowedError" || err?.name === "PermissionDeniedError") {
-        toast.error("Microphone permission denied. Allow mic access in browser settings.");
-      } else {
-        toast.error(`Mic test failed: ${err?.message || "Unknown error"}`);
-      }
+      toast.error(message);
     } finally {
       setTesting(false);
     }
@@ -160,7 +159,7 @@ const MicTest = () => {
     };
   }, [stopAudio, stopSpeech]);
 
-  const statusConfig: Record<PermissionState, { label: string; color: string; icon: any }> = {
+  const statusConfig: Record<MicPermissionStatus, { label: string; color: string; icon: any }> = {
     granted: {
       label: "Allowed",
       color: "text-success",
@@ -180,6 +179,11 @@ const MicTest = () => {
       label: "Unknown",
       color: "text-muted-foreground",
       icon: AlertCircle,
+    },
+    unsupported: {
+      label: "Unsupported",
+      color: "text-destructive",
+      icon: XCircle,
     },
   };
 
@@ -223,6 +227,18 @@ const MicTest = () => {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Browser tab mode</span>
+              <span className={`font-semibold ${isEmbeddedFrame() ? "text-warning" : "text-success"}`}>
+                {isEmbeddedFrame() ? "Preview iframe" : "Full tab"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Secure page</span>
+              <span className={`font-semibold ${window.isSecureContext ? "text-success" : "text-destructive"}`}>
+                {window.isSecureContext ? "Yes" : "No"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Voice recognition support</span>
               <span className={`font-semibold ${speechSupported ? "text-success" : "text-destructive"}`}>
                 {speechSupported ? "Supported" : "Not supported"}
@@ -236,6 +252,20 @@ const MicTest = () => {
             </div>
           </div>
         </div>
+
+        {(lastError || isEmbeddedFrame() || permission === "denied") && (
+          <div className="bg-warning/10 border border-warning/40 rounded-2xl p-4 space-y-3 text-sm">
+            <div className="flex gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 text-warning mt-0.5" />
+              <p className="text-foreground">
+                {lastError || "Preview iframe lo microphone block avvachu. Full browser tab lo open chesi Allow select cheyyandi."}
+              </p>
+            </div>
+            <Button type="button" variant="secondary" className="w-full" onClick={openCurrentPageInFullTab}>
+              Open Full Tab
+            </Button>
+          </div>
+        )}
 
         {/* Live meter */}
         <div className="bg-card border border-border rounded-2xl p-5 shadow-card space-y-4">
@@ -286,6 +316,7 @@ const MicTest = () => {
             <li>Open this app in a full browser tab (not an iframe preview).</li>
             <li>Tap <strong>Test Mic</strong> and choose <strong>Allow</strong> when prompted.</li>
             <li>If blocked, go to browser settings → Site settings → Microphone → Allow.</li>
+            <li>Phone lo address bar lock icon tap chesi microphone permission reset cheyyandi.</li>
             <li>Use Chrome or Edge for best voice recognition support.</li>
             <li>iOS Safari supports speech recognition only while the page is active.</li>
           </ul>

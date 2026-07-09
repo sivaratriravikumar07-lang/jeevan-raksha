@@ -1,7 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, AudioWaveform } from "lucide-react";
+import { Link } from "react-router-dom";
+import { AlertCircle, AudioWaveform, ExternalLink, Mic, MicOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  getMicAccessErrorMessage,
+  getMicPermissionStatus,
+  isEmbeddedFrame,
+  MicPermissionStatus,
+  openCurrentPageInFullTab,
+  requestMicrophoneStream,
+  watchMicPermission,
+} from "@/lib/microphone";
 
 interface Props { onDetect: () => void; threshold?: number }
 
@@ -9,14 +20,24 @@ interface Props { onDetect: () => void; threshold?: number }
  * Listens to the mic and triggers `onDetect` when a sustained loud sound (crash / scream)
  * is detected. Uses Web Audio AnalyserNode (no recording / upload).
  */
-export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
+export const SoundDetector = ({ onDetect, threshold = 0.18 }: Props) => {
   const [enabled, setEnabled] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [level, setLevel] = useState(0);
+  const [micPermission, setMicPermission] = useState<MicPermissionStatus>("unknown");
+  const [micError, setMicError] = useState("");
   const ctxRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastTriggerRef = useRef(0);
   const loudStartRef = useRef<number | null>(null);
+  const onDetectRef = useRef(onDetect);
+
+  useEffect(() => {
+    onDetectRef.current = onDetect;
+  }, [onDetect]);
+
+  useEffect(() => watchMicPermission(setMicPermission), []);
 
   const stop = () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -25,14 +46,19 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
     streamRef.current = null;
     ctxRef.current?.close().catch(() => {});
     ctxRef.current = null;
+    loudStartRef.current = null;
     setLevel(0);
   };
 
   const start = async () => {
+    if (streamRef.current) return;
+    setStarting(true);
+    setMicError("");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await requestMicrophoneStream();
       streamRef.current = stream;
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (ctx.state === "suspended") await ctx.resume();
       ctxRef.current = ctx;
       const src = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
@@ -53,12 +79,12 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
         const now = Date.now();
         if (rms > threshold) {
           if (loudStartRef.current === null) loudStartRef.current = now;
-          // Sustained loud (>250ms) and cooldown 10s
-          if (now - loudStartRef.current > 250 && now - lastTriggerRef.current > 10000) {
+          // Sustained loud (>180ms) and cooldown 10s
+          if (now - loudStartRef.current > 180 && now - lastTriggerRef.current > 10000) {
             lastTriggerRef.current = now;
             loudStartRef.current = null;
             toast.error("Loud sound detected — triggering SOS!");
-            onDetect();
+            onDetectRef.current();
           }
         } else {
           loudStartRef.current = null;
@@ -66,22 +92,37 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
         rafRef.current = requestAnimationFrame(tick);
       };
       tick();
+      setMicPermission(await getMicPermissionStatus());
+      setEnabled(true);
       toast.success("Sound shield ON — mic is listening for crashes/screams.");
     } catch (err: any) {
       console.log("Sound shield mic error:", err);
-      toast.error(`Mic permission denied: ${err?.message || "cannot enable sound shield"}. Open in browser tab & allow mic.`);
+      const message = getMicAccessErrorMessage(err);
+      setMicError(message);
+      setMicPermission(await getMicPermissionStatus());
+      toast.error(message);
       setEnabled(false);
+      stop();
+    } finally {
+      setStarting(false);
     }
   };
 
   useEffect(() => {
-    if (enabled) start();
-    else stop();
     return () => stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, []);
 
-  const pct = Math.min(100, Math.round(level * 200));
+  const handleEnabledChange = (checked: boolean) => {
+    if (checked) start();
+    else {
+      setEnabled(false);
+      stop();
+    }
+  };
+
+  const pct = Math.min(100, Math.round(level * 350));
+  const showMicHelp = micError || micPermission === "denied" || isEmbeddedFrame();
 
   return (
     <div className="bg-card border border-border rounded-2xl p-4 shadow-card">
@@ -94,10 +135,10 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
             <div className="font-semibold text-sm flex items-center gap-1">
               <AudioWaveform className="w-3.5 h-3.5" /> Sound Shield
             </div>
-            <div className="text-xs text-muted-foreground">Auto-SOS on crash/scream</div>
+            <div className="text-xs text-muted-foreground">{starting ? "Starting mic..." : `Mic: ${micPermission}`}</div>
           </div>
         </div>
-        <Switch checked={enabled} onCheckedChange={setEnabled} />
+        <Switch checked={enabled} onCheckedChange={handleEnabledChange} disabled={starting} />
       </div>
       {enabled && (
         <div className="h-2 bg-accent rounded-full overflow-hidden mt-3">
@@ -105,6 +146,26 @@ export const SoundDetector = ({ onDetect, threshold = 0.35 }: Props) => {
             className={`h-full transition-all ${level > threshold ? "bg-primary" : "bg-secondary"}`}
             style={{ width: `${pct}%` }}
           />
+        </div>
+      )}
+      {showMicHelp && !enabled && (
+        <div className="mt-3 rounded-2xl border border-warning/40 bg-warning/10 p-3 text-sm">
+          <div className="flex gap-2">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+            <div className="space-y-3">
+              <p className="text-foreground">
+                {micError || "Preview iframe lo mic block avvachu. Full browser tab lo open chesi Allow cheyyandi."}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" size="sm" variant="secondary" onClick={openCurrentPageInFullTab}>
+                  <ExternalLink className="h-4 w-4" /> Open Full Tab
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/mic-test">Mic Test</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
