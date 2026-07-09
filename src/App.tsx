@@ -24,6 +24,7 @@ import Journey from "./pages/Journey";
 import WomenSafety from "./pages/WomenSafety";
 import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
+import MicTest from "./pages/MicTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
