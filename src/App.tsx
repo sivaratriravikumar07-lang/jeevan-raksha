@@ -56,6 +56,7 @@ const App = () => (
             <Route path="/women-safety" element={<ProtectedRoute><WomenSafety /></ProtectedRoute>} />
             <Route path="/offline-sos" element={<ProtectedRoute><OfflineSOS /></ProtectedRoute>} />
             <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+            <Route path="/mic-test" element={<ProtectedRoute><MicTest /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
