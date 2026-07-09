@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Shield, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
-  Share2, Navigation, Heart, WifiOff, Camera,
+  Share2, Navigation, Heart, WifiOff, Camera, Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
