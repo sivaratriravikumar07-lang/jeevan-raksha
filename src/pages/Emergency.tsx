@@ -59,6 +59,7 @@ const Emergency = () => {
       ]);
       const list = (cs ?? []) as ContactLite[];
       setContacts(list);
+      contactsRef.current = list;
 
       const msg = buildEmergencyMessage(
         {
