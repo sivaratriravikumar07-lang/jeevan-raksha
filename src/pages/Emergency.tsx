@@ -21,6 +21,8 @@ const Emergency = () => {
   const [smsOpened, setSmsOpened] = useState(false);
   const watchRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const contactsRef = useRef<ContactLite[]>([]);
+  const messageRef = useRef<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -57,6 +59,7 @@ const Emergency = () => {
       ]);
       const list = (cs ?? []) as ContactLite[];
       setContacts(list);
+      contactsRef.current = list;
 
       const msg = buildEmergencyMessage(
         {
@@ -68,17 +71,13 @@ const Emergency = () => {
         lat && lng ? { lat, lng } : null,
       );
       setMessage(msg);
+      messageRef.current = msg;
 
       if (list.length) {
         await supabase.from("alerts").insert(
-          list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "sent" })),
+          list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "queued" })),
         );
-        // Auto-open SMS composer to ALL contacts at once
-        setTimeout(() => {
-          openSmsToAll(list, msg);
-          setSmsOpened(true);
-          toast.success(`SMS opened for ${list.length} contact${list.length > 1 ? "s" : ""} — tap Send`);
-        }, 600);
+        toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
       } else {
         toast.warning("No trusted contacts. Add some after this emergency.");
       }
@@ -93,12 +92,26 @@ const Emergency = () => {
       });
     })();
 
-    // 15-sec countdown to Police 100
+    // 15-sec countdown → auto-SMS to contacts + Call Police 100
     timerRef.current = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
-          window.location.href = "tel:100";
+          const list = contactsRef.current;
+          const msg = messageRef.current;
+          if (list.length && msg) {
+            openSmsToAll(list, msg);
+            setSmsOpened(true);
+            // mark alerts as sent
+            if (incidentId) {
+              supabase.from("alerts").update({ status: "sent" }).eq("incident_id", incidentId);
+            }
+            toast.success(`SMS opened for ${list.length} contact${list.length > 1 ? "s" : ""}. Calling 100…`);
+            // Give SMS app ~2.5s to launch before switching to dialer
+            setTimeout(() => { window.location.href = "tel:100"; }, 2500);
+          } else {
+            window.location.href = "tel:100";
+          }
           return 0;
         }
         return c - 1;
