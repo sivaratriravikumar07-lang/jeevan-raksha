@@ -71,6 +71,7 @@ const Emergency = () => {
         lat && lng ? { lat, lng } : null,
       );
       setMessage(msg);
+      messageRef.current = msg;
 
       if (list.length) {
         await supabase.from("alerts").insert(
