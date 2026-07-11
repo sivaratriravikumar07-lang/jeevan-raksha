@@ -21,6 +21,8 @@ const Emergency = () => {
   const [smsOpened, setSmsOpened] = useState(false);
   const watchRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const contactsRef = useRef<ContactLite[]>([]);
+  const messageRef = useRef<string>("");
 
   useEffect(() => {
     if (!user) return;
