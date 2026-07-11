@@ -71,14 +71,9 @@ const Emergency = () => {
 
       if (list.length) {
         await supabase.from("alerts").insert(
-          list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "sent" })),
+          list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "queued" })),
         );
-        // Auto-open SMS composer to ALL contacts at once
-        setTimeout(() => {
-          openSmsToAll(list, msg);
-          setSmsOpened(true);
-          toast.success(`SMS opened for ${list.length} contact${list.length > 1 ? "s" : ""} — tap Send`);
-        }, 600);
+        toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
       } else {
         toast.warning("No trusted contacts. Add some after this emergency.");
       }
