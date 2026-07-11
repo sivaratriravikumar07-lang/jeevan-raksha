@@ -92,12 +92,26 @@ const Emergency = () => {
       });
     })();
 
-    // 15-sec countdown to Police 100
+    // 15-sec countdown → auto-SMS to contacts + Call Police 100
     timerRef.current = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
           if (timerRef.current) clearInterval(timerRef.current);
-          window.location.href = "tel:100";
+          const list = contactsRef.current;
+          const msg = messageRef.current;
+          if (list.length && msg) {
+            openSmsToAll(list, msg);
+            setSmsOpened(true);
+            // mark alerts as sent
+            if (incidentId) {
+              supabase.from("alerts").update({ status: "sent" }).eq("incident_id", incidentId);
+            }
+            toast.success(`SMS opened for ${list.length} contact${list.length > 1 ? "s" : ""}. Calling 100…`);
+            // Give SMS app ~2.5s to launch before switching to dialer
+            setTimeout(() => { window.location.href = "tel:100"; }, 2500);
+          } else {
+            window.location.href = "tel:100";
+          }
           return 0;
         }
         return c - 1;
