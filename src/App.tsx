@@ -25,6 +25,9 @@ import WomenSafety from "./pages/WomenSafety";
 import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
 import MicTest from "./pages/MicTest";
+import PanicTimer from "./pages/PanicTimer";
+import Whistle from "./pages/Whistle";
+import FirstAid from "./pages/FirstAid";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +60,9 @@ const App = () => (
             <Route path="/offline-sos" element={<ProtectedRoute><OfflineSOS /></ProtectedRoute>} />
             <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
             <Route path="/mic-test" element={<ProtectedRoute><MicTest /></ProtectedRoute>} />
+            <Route path="/panic-timer" element={<ProtectedRoute><PanicTimer /></ProtectedRoute>} />
+            <Route path="/whistle" element={<ProtectedRoute><Whistle /></ProtectedRoute>} />
+            <Route path="/first-aid" element={<ProtectedRoute><FirstAid /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
