@@ -28,6 +28,7 @@ import MicTest from "./pages/MicTest";
 import PanicTimer from "./pages/PanicTimer";
 import Whistle from "./pages/Whistle";
 import FirstAid from "./pages/FirstAid";
+import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/panic-timer" element={<ProtectedRoute><PanicTimer /></ProtectedRoute>} />
             <Route path="/whistle" element={<ProtectedRoute><Whistle /></ProtectedRoute>} />
             <Route path="/first-aid" element={<ProtectedRoute><FirstAid /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

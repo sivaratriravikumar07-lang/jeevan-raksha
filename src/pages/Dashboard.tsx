@@ -4,7 +4,7 @@ import {
   Shield, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
-  Timer, Volume2, HeartPulse,
+  Timer, Volume2, HeartPulse, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
