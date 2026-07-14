@@ -4,7 +4,7 @@ import {
   Shield, Users, LogOut,
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
-  Timer, Volume2, HeartPulse,
+  Timer, Volume2, HeartPulse, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -121,8 +121,24 @@ const Dashboard = () => {
           </button>
         </div>
 
+        {/* Raksha AI chatbot */}
+        <button
+          onClick={() => navigate("/chat")}
+          className="w-full flex items-center gap-3 p-4 bg-gradient-trust rounded-2xl shadow-trust text-secondary-foreground text-left"
+        >
+          <div className="w-11 h-11 rounded-xl bg-background/20 backdrop-blur flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-sm">Ask Raksha AI</div>
+            <div className="text-xs opacity-85">Safety tips, first aid, helplines — anytime</div>
+          </div>
+          <span className="text-xs font-semibold">Chat →</span>
+        </button>
+
         {/* Sound Shield — accident / scream detection */}
         <SoundDetector onDetect={() => navigate("/emergency")} />
+
 
         {/* Voice SOS */}
         <VoiceActivation onTrigger={() => navigate("/emergency")} />
