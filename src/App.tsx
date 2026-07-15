@@ -29,6 +29,12 @@ import PanicTimer from "./pages/PanicTimer";
 import Whistle from "./pages/Whistle";
 import FirstAid from "./pages/FirstAid";
 import Chat from "./pages/Chat";
+import Guardian from "./pages/Guardian";
+import Calculator from "./pages/Calculator";
+import MedicalID from "./pages/MedicalID";
+import DangerZones from "./pages/DangerZones";
+import SafeZones from "./pages/SafeZones";
+import StealthCapture from "./pages/StealthCapture";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
