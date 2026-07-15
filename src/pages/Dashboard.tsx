@@ -5,6 +5,7 @@ import {
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
   Timer, Volume2, HeartPulse, Sparkles,
+  ShieldCheck, MapPinned, AlertTriangle, Calculator as CalcIcon, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -220,6 +221,30 @@ const Dashboard = () => {
             <button onClick={() => navigate("/evidence")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
               <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><Camera className="w-5 h-5 text-primary-foreground" /></div>
               <div><div className="font-semibold text-sm">Evidence</div><div className="text-xs text-muted-foreground">Photo/video vault</div></div>
+            </button>
+            <button onClick={() => navigate("/guardian")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><ShieldCheck className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Guardian Angel</div><div className="text-xs text-muted-foreground">Trip auto-SOS</div></div>
+            </button>
+            <button onClick={() => navigate("/medical-id")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><HeartPulse className="w-5 h-5 text-primary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Medical ID</div><div className="text-xs text-muted-foreground">Blood · allergies</div></div>
+            </button>
+            <button onClick={() => navigate("/danger-zones")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><AlertTriangle className="w-5 h-5 text-primary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Danger Zones</div><div className="text-xs text-muted-foreground">Risk heatmap</div></div>
+            </button>
+            <button onClick={() => navigate("/safe-zones")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><MapPinned className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Safe Zones</div><div className="text-xs text-muted-foreground">Geofence alerts</div></div>
+            </button>
+            <button onClick={() => navigate("/stealth")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><Eye className="w-5 h-5 text-primary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Stealth Capture</div><div className="text-xs text-muted-foreground">Silent evidence</div></div>
+            </button>
+            <button onClick={() => navigate("/calculator")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><CalcIcon className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Disguise Mode</div><div className="text-xs text-muted-foreground">Calculator decoy</div></div>
             </button>
           </div>
         </section>
