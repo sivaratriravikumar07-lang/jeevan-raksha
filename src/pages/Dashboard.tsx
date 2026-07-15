@@ -5,6 +5,7 @@ import {
   Phone, Hospital, PhoneCall, Activity, MessageSquare, BookOpen,
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
   Timer, Volume2, HeartPulse, Sparkles,
+  ShieldCheck, MapPinned, AlertTriangle, Calculator as CalcIcon, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
