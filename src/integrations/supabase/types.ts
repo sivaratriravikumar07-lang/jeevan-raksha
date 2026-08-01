@@ -52,6 +52,33 @@ export type Database = {
           },
         ]
       }
+      danger_zone_cache: {
+        Row: {
+          area_label: string | null
+          cell_key: string
+          latitude: number
+          longitude: number
+          updated_at: string
+          zones: Json
+        }
+        Insert: {
+          area_label?: string | null
+          cell_key: string
+          latitude: number
+          longitude: number
+          updated_at?: string
+          zones: Json
+        }
+        Update: {
+          area_label?: string | null
+          cell_key?: string
+          latitude?: number
+          longitude?: number
+          updated_at?: string
+          zones?: Json
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           created_at: string
