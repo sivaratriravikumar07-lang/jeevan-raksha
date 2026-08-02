@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
-import { Shield, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { Logo } from "@/components/Logo";
 
 const signUpSchema = z.object({
   fullName: z.string().trim().min(2, "Name required").max(80),
@@ -69,9 +70,7 @@ const Auth = () => {
       <main className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-emergency shadow-emergency mb-4">
-              <Shield className="w-7 h-7 text-primary-foreground" />
-            </div>
+            <Logo className="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-emergency" />
             <h1 className="text-2xl font-bold mb-1">{mode === "signup" ? "Create your account" : "Welcome back"}</h1>
             <p className="text-sm text-muted-foreground">{mode === "signup" ? "Stay protected in seconds." : "Sign in to access your safety dashboard."}</p>
           </div>
