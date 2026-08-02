@@ -116,7 +116,10 @@ const Emergency = () => {
           if (timerRef.current) clearInterval(timerRef.current);
           const list = contactsRef.current;
           const msg = messageRef.current;
-          if (list.length && msg) {
+          if (autoSmsRef.current > 0) {
+            // Gateway already delivered the SMS automatically — just call 100.
+            window.location.href = "tel:100";
+          } else if (list.length && msg) {
             openSmsToAll(list, msg);
             setSmsOpened(true);
             // mark alerts as sent
@@ -129,6 +132,7 @@ const Emergency = () => {
           } else {
             window.location.href = "tel:100";
           }
+
           return 0;
         }
         return c - 1;
