@@ -17,6 +17,10 @@ import { SoundDetector } from "@/components/SoundDetector";
 import { BottomNav } from "@/components/BottomNav";
 import { SOSButton } from "@/components/SOSButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Logo } from "@/components/Logo";
+import { useVolumeSOS } from "@/hooks/useVolumeSOS";
+import { vibrate } from "@/lib/emergency";
+
 
 interface Profile { full_name: string; phone: string | null; }
 interface Contact { id: string }
@@ -45,11 +49,19 @@ const Dashboard = () => {
     })();
   }, [user]);
 
+  // Hardware volume button pressed 3x → direct call to Police 100
+  useVolumeSOS(() => {
+    vibrate([300, 100, 300]);
+    toast.error("Volume 3x detected — calling Police 100…");
+    window.location.href = "tel:100";
+  });
+
   const handleSignOut = async () => {
     await signOut();
     toast.success("Signed out");
     navigate("/");
   };
+
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -57,11 +69,10 @@ const Dashboard = () => {
         <div className="container py-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-background/20 backdrop-blur flex items-center justify-center">
-                <Shield className="w-5 h-5" />
-              </div>
+              <Logo className="w-9 h-9" />
               <span className="font-bold">Jeevan Raksha</span>
             </div>
+
             <div className="flex items-center gap-1">
               <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-secondary-foreground hover:bg-background/20">

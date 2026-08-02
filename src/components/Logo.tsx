@@ -1,0 +1,19 @@
+import logoAsset from "@/assets/jeevan-raksha-logo.jpg.asset.json";
+import { cn } from "@/lib/utils";
+
+interface LogoProps {
+  className?: string;
+  alt?: string;
+}
+
+/** Jeevan Raksha brand mark */
+export const Logo = ({ className, alt = "Jeevan Raksha logo" }: LogoProps) => (
+  <img
+    src={logoAsset.url}
+    alt={alt}
+    loading="lazy"
+    className={cn("object-contain rounded-xl bg-foreground/90", className)}
+  />
+);
+
+export default Logo;

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
+
 
 const features = [
   { icon: Zap, title: "One-Tap SOS", desc: "Instantly alert your trusted circle with a single press." },
@@ -18,11 +20,10 @@ const Index = () => {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-emergency flex items-center justify-center shadow-emergency">
-              <Shield className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <Logo className="w-9 h-9 shadow-emergency" />
             <span className="font-bold text-lg tracking-tight">Jeevan Raksha</span>
           </Link>
+
           <div className="flex items-center gap-2">
             <Link to="/auth"><Button variant="ghost" size="sm">Login</Button></Link>
             <Link to="/auth?mode=signup"><Button size="sm" className="bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
@@ -58,8 +59,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Pulsing SOS preview */}
-          <div className="flex justify-center mt-16">
+          {/* Brand mark + pulsing SOS preview */}
+          <div className="flex flex-col items-center gap-8 mt-16">
+            <Logo className="w-40 h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
             <div className="relative">
               <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
                 <div className="text-center text-primary-foreground">
@@ -69,6 +71,7 @@ const Index = () => {
               </div>
             </div>
           </div>
+
         </div>
       </section>
 

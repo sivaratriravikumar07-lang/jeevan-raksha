@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPinned, Plus, Trash2, Home } from "lucide-react";
+import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -61,6 +61,12 @@ const SafeZones = () => {
 
   const remove = (id: string) => setZones(zones.filter(z => z.id !== id));
 
+  const insideZone = zones.find((z) => z.id === insideId) ?? null;
+  const ranked = current
+    ? [...zones].map((z) => ({ ...z, dist: distanceM(current, z) })).sort((a, b) => a.dist - b.dist)
+    : zones.map((z) => ({ ...z, dist: null as number | null }));
+  const fmt = (m: number) => (m < 1000 ? `${Math.round(m)} m away` : `${(m / 1000).toFixed(1)} km away`);
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <header className="bg-gradient-trust text-secondary-foreground">
@@ -68,21 +74,41 @@ const SafeZones = () => {
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-lg bg-background/20 flex items-center justify-center"><ArrowLeft className="w-5 h-5" /></button>
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2"><MapPinned className="w-5 h-5" /> Safe Zones</h1>
-            <p className="text-xs opacity-85">Geofence home, office, college</p>
+            <p className="text-xs opacity-85">Home, office, college — meeru safe ga unnara ani check chestundi</p>
           </div>
         </div>
       </header>
 
       <main className="container py-5 space-y-4">
-        {insideId && (
-          <div className="bg-secondary/10 border-2 border-secondary rounded-2xl p-4 text-center">
-            <Home className="w-6 h-6 text-secondary mx-auto mb-1" />
-            <p className="text-sm font-bold text-secondary">Inside a safe zone 💚</p>
-          </div>
-        )}
+        {/* Live status */}
+        <div className={`rounded-2xl p-4 text-center border-2 ${insideZone ? "bg-secondary/10 border-secondary" : "bg-muted/40 border-border"}`}>
+          {insideZone ? (
+            <>
+              <Home className="w-6 h-6 text-secondary mx-auto mb-1" />
+              <p className="text-sm font-bold text-secondary">Inside “{insideZone.name}” — you are safe 💚</p>
+            </>
+          ) : (
+            <>
+              <ShieldAlert className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+              <p className="text-sm font-bold">Outside all safe zones</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {ranked[0]?.dist != null ? `Nearest: ${ranked[0].name} · ${fmt(ranked[0].dist)}` : "Stay alert. Add a zone below."}
+              </p>
+            </>
+          )}
+        </div>
 
         <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
           <p className="text-sm font-semibold">Add current location as safe zone</p>
+          <div className="flex flex-wrap gap-2">
+            {["Home", "Office", "College", "Hostel"].map((p) => (
+              <button
+                key={p}
+                onClick={() => setName(p)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${name === p ? "bg-secondary text-secondary-foreground border-secondary" : "bg-muted/50 border-border"}`}
+              >{p}</button>
+            ))}
+          </div>
           <Input placeholder="Name (Home, Office…)" value={name} onChange={(e) => setName(e.target.value)} />
           <div>
             <label className="text-xs text-muted-foreground">Radius: {radius} m</label>
@@ -93,13 +119,23 @@ const SafeZones = () => {
 
         <div className="space-y-2">
           {zones.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No safe zones yet</p>}
-          {zones.map(z => (
-            <div key={z.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-sm">{z.name}</p>
-                <p className="text-xs text-muted-foreground">Radius {z.radiusM}m · {z.lat.toFixed(4)}, {z.lng.toFixed(4)}</p>
+          {ranked.map(z => (
+            <div key={z.id} className={`bg-card border rounded-2xl p-4 flex items-center justify-between ${z.id === insideId ? "border-secondary" : "border-border"}`}>
+              <div className="min-w-0">
+                <p className="font-semibold text-sm flex items-center gap-2">
+                  {z.name}
+                  {z.id === insideId && <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-bold uppercase">Inside</span>}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Radius {z.radiusM}m{z.dist != null ? ` · ${fmt(z.dist)}` : ""}
+                </p>
               </div>
-              <Button size="icon" variant="ghost" onClick={() => remove(z.id)}><Trash2 className="w-4 h-4 text-primary" /></Button>
+              <div className="flex items-center gap-1 shrink-0">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${z.lat},${z.lng}`} target="_blank" rel="noreferrer">
+                  <Button size="icon" variant="ghost"><Navigation className="w-4 h-4 text-secondary" /></Button>
+                </a>
+                <Button size="icon" variant="ghost" onClick={() => remove(z.id)}><Trash2 className="w-4 h-4 text-primary" /></Button>
+              </div>
             </div>
           ))}
         </div>
@@ -107,5 +143,6 @@ const SafeZones = () => {
     </div>
   );
 };
+
 
 export default SafeZones;
