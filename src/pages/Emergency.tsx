@@ -210,6 +210,13 @@ const Emergency = () => {
           </div>
         )}
 
+        {autoSmsSent > 0 && (
+          <div className="bg-background/25 backdrop-blur-sm rounded-2xl px-4 py-3 w-full max-w-sm text-xs font-semibold">
+            ✅ Auto SMS delivered to {autoSmsSent} contact{autoSmsSent > 1 ? "s" : ""} with your live location
+          </div>
+        )}
+
+
         {/* Alert dispatch buttons */}
         {contacts.length > 0 && message && (
           <div className="bg-background/15 backdrop-blur-sm rounded-2xl p-4 w-full max-w-sm space-y-2">
