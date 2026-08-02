@@ -77,10 +77,24 @@ const Emergency = () => {
         await supabase.from("alerts").insert(
           list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "queued" })),
         );
-        toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+        // 1) Try real auto-SMS via the SMS gateway (no tap needed)
+        try {
+          const { data: smsRes, error: smsErr } = await supabase.functions.invoke("send-sos-sms", {
+            body: { incidentId: incident.id, latitude: lat || null, longitude: lng || null },
+          });
+          if (!smsErr && smsRes?.configured && smsRes?.sent > 0) {
+            if (!cancelled) setAutoSmsSent(smsRes.sent);
+            toast.success(`Auto SMS sent to ${smsRes.sent} contact${smsRes.sent > 1 ? "s" : ""} with live location.`);
+          } else {
+            toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+          }
+        } catch {
+          toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+        }
       } else {
         toast.warning("No trusted contacts. Add some after this emergency.");
       }
+
 
       // Live location tracking
       watchRef.current = watchPosition((p) => {
