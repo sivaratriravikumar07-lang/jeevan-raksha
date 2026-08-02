@@ -59,8 +59,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Pulsing SOS preview */}
-          <div className="flex justify-center mt-16">
+          {/* Brand mark + pulsing SOS preview */}
+          <div className="flex flex-col items-center gap-8 mt-16">
+            <Logo className="w-40 h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
             <div className="relative">
               <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
                 <div className="text-center text-primary-foreground">
@@ -70,6 +71,7 @@ const Index = () => {
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
