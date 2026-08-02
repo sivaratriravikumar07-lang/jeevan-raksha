@@ -86,7 +86,9 @@ const Emergency = () => {
             body: { incidentId: incident.id, latitude: lat || null, longitude: lng || null },
           });
           if (!smsErr && smsRes?.configured && smsRes?.sent > 0) {
+            autoSmsRef.current = smsRes.sent;
             if (!cancelled) setAutoSmsSent(smsRes.sent);
+
             toast.success(`Auto SMS sent to ${smsRes.sent} contact${smsRes.sent > 1 ? "s" : ""} with live location.`);
           } else {
             toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
