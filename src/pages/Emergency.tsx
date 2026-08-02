@@ -19,6 +19,9 @@ const Emergency = () => {
   const [contacts, setContacts] = useState<ContactLite[]>([]);
   const [message, setMessage] = useState("");
   const [smsOpened, setSmsOpened] = useState(false);
+  const [autoSmsSent, setAutoSmsSent] = useState(0);
+  const autoSmsRef = useRef(0);
+
   const watchRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contactsRef = useRef<ContactLite[]>([]);
