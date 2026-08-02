@@ -19,6 +19,9 @@ const Emergency = () => {
   const [contacts, setContacts] = useState<ContactLite[]>([]);
   const [message, setMessage] = useState("");
   const [smsOpened, setSmsOpened] = useState(false);
+  const [autoSmsSent, setAutoSmsSent] = useState(0);
+  const autoSmsRef = useRef(0);
+
   const watchRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contactsRef = useRef<ContactLite[]>([]);
@@ -77,10 +80,26 @@ const Emergency = () => {
         await supabase.from("alerts").insert(
           list.map((c) => ({ incident_id: incident.id, user_id: user.id, channel: "sms", recipient: c.phone, status: "queued" })),
         );
-        toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+        // 1) Try real auto-SMS via the SMS gateway (no tap needed)
+        try {
+          const { data: smsRes, error: smsErr } = await supabase.functions.invoke("send-sos-sms", {
+            body: { incidentId: incident.id, latitude: lat || null, longitude: lng || null },
+          });
+          if (!smsErr && smsRes?.configured && smsRes?.sent > 0) {
+            autoSmsRef.current = smsRes.sent;
+            if (!cancelled) setAutoSmsSent(smsRes.sent);
+
+            toast.success(`Auto SMS sent to ${smsRes.sent} contact${smsRes.sent > 1 ? "s" : ""} with live location.`);
+          } else {
+            toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+          }
+        } catch {
+          toast.info(`SMS will auto-open with call to 100 in 15s. ${list.length} contact${list.length > 1 ? "s" : ""} ready.`);
+        }
       } else {
         toast.warning("No trusted contacts. Add some after this emergency.");
       }
+
 
       // Live location tracking
       watchRef.current = watchPosition((p) => {
@@ -99,7 +118,10 @@ const Emergency = () => {
           if (timerRef.current) clearInterval(timerRef.current);
           const list = contactsRef.current;
           const msg = messageRef.current;
-          if (list.length && msg) {
+          if (autoSmsRef.current > 0) {
+            // Gateway already delivered the SMS automatically — just call 100.
+            window.location.href = "tel:100";
+          } else if (list.length && msg) {
             openSmsToAll(list, msg);
             setSmsOpened(true);
             // mark alerts as sent
@@ -112,6 +134,7 @@ const Emergency = () => {
           } else {
             window.location.href = "tel:100";
           }
+
           return 0;
         }
         return c - 1;
@@ -186,6 +209,13 @@ const Emergency = () => {
             >Open in Maps →</a>
           </div>
         )}
+
+        {autoSmsSent > 0 && (
+          <div className="bg-background/25 backdrop-blur-sm rounded-2xl px-4 py-3 w-full max-w-sm text-xs font-semibold">
+            ✅ Auto SMS delivered to {autoSmsSent} contact{autoSmsSent > 1 ? "s" : ""} with your live location
+          </div>
+        )}
+
 
         {/* Alert dispatch buttons */}
         {contacts.length > 0 && message && (
