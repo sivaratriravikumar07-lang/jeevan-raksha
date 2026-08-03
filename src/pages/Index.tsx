@@ -35,7 +35,7 @@ const Index = () => {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div className="container relative py-16 md:py-24">
+        <div className="container relative py-10 sm:py-16 md:py-24">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
