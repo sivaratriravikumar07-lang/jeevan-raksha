@@ -62,17 +62,15 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Brand mark + pulsing SOS preview */}
-          <div className="flex flex-col items-center gap-8 mt-10 sm:mt-16">
-            <Logo className="w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
-
-            <div className="relative">
-              <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
-                <div className="text-center text-primary-foreground">
-                  <Shield className="w-10 h-10 mx-auto mb-2" />
-                  <div className="text-3xl font-extrabold tracking-wider">SOS</div>
-                </div>
-              </div>
+          {/* Hero brand image */}
+          <div className="flex flex-col items-center mt-10 sm:mt-14">
+            <div className="relative group">
+              <div className="absolute -inset-3 bg-gradient-emergency rounded-[2.5rem] opacity-30 blur-2xl group-hover:opacity-40 transition-opacity" />
+              <img
+                src={heroLogoAsset.url}
+                alt="Jeevan Raksha — India's Women Safety Companion"
+                className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain rounded-[2rem] shadow-elevated bg-background/50"
+              />
             </div>
           </div>
 
