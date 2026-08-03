@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import heroLogoAsset from "@/assets/jeevan-raksha-hero-logo.jpg.asset.json";
 
 
 const features = [
@@ -35,11 +36,25 @@ const Index = () => {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div className="container relative py-10 sm:py-16 md:py-24">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
+        <div className="container relative py-8 sm:py-12 md:py-20">
+          <div className="max-w-2xl mx-auto text-center space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
             </div>
+
+            {/* Hero brand image */}
+            <div className="flex justify-center py-2">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-emergency rounded-full opacity-25 blur-3xl group-hover:opacity-35 transition-opacity" />
+                <div className="absolute -inset-1 bg-gradient-to-br from-red-500/20 to-blue-600/20 rounded-[2.5rem] blur-xl" />
+                <img
+                  src={heroLogoAsset.url}
+                  alt="Jeevan Raksha — India's Women Safety Companion"
+                  className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-80 md:h-80 object-contain drop-shadow-2xl"
+                />
+              </div>
+            </div>
+
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
               Safety in <span className="text-gradient-emergency">one tap.</span>
               <br />
@@ -49,7 +64,7 @@ const Index = () => {
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
               <Link to="/auth?mode=signup" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
                   <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
@@ -60,21 +75,6 @@ const Index = () => {
               </Link>
             </div>
           </div>
-
-          {/* Brand mark + pulsing SOS preview */}
-          <div className="flex flex-col items-center gap-8 mt-10 sm:mt-16">
-            <Logo className="w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
-
-            <div className="relative">
-              <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
-                <div className="text-center text-primary-foreground">
-                  <Shield className="w-10 h-10 mx-auto mb-2" />
-                  <div className="text-3xl font-extrabold tracking-wider">SOS</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
