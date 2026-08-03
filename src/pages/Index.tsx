@@ -40,7 +40,7 @@ const Index = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
               Safety in <span className="bg-gradient-emergency bg-clip-text text-transparent">one tap.</span>
               <br />
               Help in <span className="bg-gradient-trust bg-clip-text text-transparent">seconds.</span>
