@@ -100,10 +100,23 @@
 }
 
 @layer utilities {
-  .bg-gradient-emergency { background: var(--gradient-emergency); }
-  .bg-gradient-trust { background: var(--gradient-trust); }
-  .bg-gradient-hero { background: var(--gradient-hero); }
-  .bg-gradient-card { background: var(--gradient-card); }
+  .bg-gradient-emergency { background-image: var(--gradient-emergency); }
+  .bg-gradient-trust { background-image: var(--gradient-trust); }
+  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-card { background-image: var(--gradient-card); }
+  .text-gradient-emergency {
+    background-image: var(--gradient-emergency);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-trust {
+    background-image: var(--gradient-trust);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   .shadow-emergency { box-shadow: var(--shadow-emergency); }
   .shadow-trust { box-shadow: var(--shadow-trust); }
   .shadow-card { box-shadow: var(--shadow-card); }
