@@ -18,50 +18,52 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo className="w-9 h-9 shadow-emergency" />
-            <span className="font-bold text-lg tracking-tight">Jeevan Raksha</span>
+        <div className="container flex items-center justify-between gap-2 h-16 min-w-0">
+          <Link to="/" className="flex items-center gap-2 min-w-0">
+            <Logo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 shadow-emergency" />
+            <span className="font-bold text-base sm:text-lg tracking-tight truncate">Jeevan Raksha</span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <Link to="/auth"><Button variant="ghost" size="sm">Login</Button></Link>
-            <Link to="/auth?mode=signup"><Button size="sm" className="bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <Link to="/auth"><Button variant="ghost" size="sm" className="px-2 sm:px-3">Login</Button></Link>
+            <Link to="/auth?mode=signup"><Button size="sm" className="px-3 bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
           </div>
         </div>
+
       </header>
 
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div className="container relative py-16 md:py-24">
+        <div className="container relative py-10 sm:py-16 md:py-24">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.05]">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
               Safety in <span className="bg-gradient-emergency bg-clip-text text-transparent">one tap.</span>
               <br />
               Help in <span className="bg-gradient-trust bg-clip-text text-transparent">seconds.</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <Link to="/auth?mode=signup">
+              <Link to="/auth?mode=signup" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
                   <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
                 </Button>
               </Link>
-              <Link to="/auth">
+              <Link to="/auth" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8">Sign In</Button>
               </Link>
             </div>
           </div>
 
           {/* Brand mark + pulsing SOS preview */}
-          <div className="flex flex-col items-center gap-8 mt-16">
-            <Logo className="w-40 h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
+          <div className="flex flex-col items-center gap-8 mt-10 sm:mt-16">
+            <Logo className="w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
+
             <div className="relative">
               <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
                 <div className="text-center text-primary-foreground">
