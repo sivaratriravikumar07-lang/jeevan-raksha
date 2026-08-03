@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
+import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import heroLogoAsset from "@/assets/jeevan-raksha-hero-logo.jpg.asset.json";
