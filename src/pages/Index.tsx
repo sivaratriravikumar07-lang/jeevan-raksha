@@ -45,24 +45,25 @@ const Index = () => {
               <br />
               Help in <span className="bg-gradient-trust bg-clip-text text-transparent">seconds.</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <Link to="/auth?mode=signup">
+              <Link to="/auth?mode=signup" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
                   <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
                 </Button>
               </Link>
-              <Link to="/auth">
+              <Link to="/auth" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8">Sign In</Button>
               </Link>
             </div>
           </div>
 
           {/* Brand mark + pulsing SOS preview */}
-          <div className="flex flex-col items-center gap-8 mt-16">
-            <Logo className="w-40 h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
+          <div className="flex flex-col items-center gap-8 mt-10 sm:mt-16">
+            <Logo className="w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 rounded-3xl shadow-elevated" alt="Jeevan Raksha emergency response logo" />
+
             <div className="relative">
               <div className="w-48 h-48 rounded-full bg-gradient-emergency shadow-emergency flex items-center justify-center animate-sos-pulse">
                 <div className="text-center text-primary-foreground">
