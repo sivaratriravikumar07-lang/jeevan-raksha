@@ -41,10 +41,11 @@ const Index = () => {
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
-              Safety in <span className="bg-gradient-emergency bg-clip-text text-transparent">one tap.</span>
+              Safety in <span className="text-gradient-emergency">one tap.</span>
               <br />
-              Help in <span className="bg-gradient-trust bg-clip-text text-transparent">seconds.</span>
+              Help in <span className="text-gradient-trust">seconds.</span>
             </h1>
+
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
             </p>
