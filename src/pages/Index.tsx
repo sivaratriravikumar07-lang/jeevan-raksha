@@ -36,11 +36,25 @@ const Index = () => {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div className="container relative py-10 sm:py-16 md:py-24">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
+        <div className="container relative py-8 sm:py-12 md:py-20">
+          <div className="max-w-2xl mx-auto text-center space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
               <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
             </div>
+
+            {/* Hero brand image */}
+            <div className="flex justify-center py-2">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-emergency rounded-full opacity-25 blur-3xl group-hover:opacity-35 transition-opacity" />
+                <div className="absolute -inset-1 bg-gradient-to-br from-red-500/20 to-blue-600/20 rounded-[2.5rem] blur-xl" />
+                <img
+                  src={heroLogoAsset.url}
+                  alt="Jeevan Raksha — India's Women Safety Companion"
+                  className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-80 md:h-80 object-contain drop-shadow-2xl"
+                />
+              </div>
+            </div>
+
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
               Safety in <span className="text-gradient-emergency">one tap.</span>
               <br />
@@ -50,7 +64,7 @@ const Index = () => {
             <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
               Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
               <Link to="/auth?mode=signup" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
                   <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
@@ -61,19 +75,6 @@ const Index = () => {
               </Link>
             </div>
           </div>
-
-          {/* Hero brand image */}
-          <div className="flex flex-col items-center mt-10 sm:mt-14">
-            <div className="relative group">
-              <div className="absolute -inset-3 bg-gradient-emergency rounded-[2.5rem] opacity-30 blur-2xl group-hover:opacity-40 transition-opacity" />
-              <img
-                src={heroLogoAsset.url}
-                alt="Jeevan Raksha — India's Women Safety Companion"
-                className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 object-contain rounded-[2rem] shadow-elevated bg-background/50"
-              />
-            </div>
-          </div>
-
         </div>
       </section>
 
