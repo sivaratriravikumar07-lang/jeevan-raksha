@@ -18,17 +18,18 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo className="w-9 h-9 shadow-emergency" />
-            <span className="font-bold text-lg tracking-tight">Jeevan Raksha</span>
+        <div className="container flex items-center justify-between gap-2 h-16 min-w-0">
+          <Link to="/" className="flex items-center gap-2 min-w-0">
+            <Logo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 shadow-emergency" />
+            <span className="font-bold text-base sm:text-lg tracking-tight truncate">Jeevan Raksha</span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <Link to="/auth"><Button variant="ghost" size="sm">Login</Button></Link>
-            <Link to="/auth?mode=signup"><Button size="sm" className="bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <Link to="/auth"><Button variant="ghost" size="sm" className="px-2 sm:px-3">Login</Button></Link>
+            <Link to="/auth?mode=signup"><Button size="sm" className="px-3 bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
           </div>
         </div>
+
       </header>
 
       {/* Hero */}
