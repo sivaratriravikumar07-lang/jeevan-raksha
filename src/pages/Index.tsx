@@ -92,15 +92,18 @@ const Index = () => {
             </div>
 
             {/* Brand mark */}
-            <div className="order-1 md:order-2 flex justify-center">
-              <div className="relative">
-                <div className="absolute -inset-6 bg-gradient-hero rounded-full opacity-30 blur-3xl" />
+            <div className="order-1 md:order-2 flex justify-center mark-3d-scene">
+              <div className="relative mark-3d">
+                <div className="absolute -inset-10 rounded-full blur-3xl mark-3d-plate" />
+                <div className="absolute -inset-6 bg-gradient-hero rounded-full opacity-25 blur-3xl" />
                 <div className="absolute -inset-3 rounded-[3rem] border border-background/15" />
+                <div className="absolute -inset-1 rounded-[2.6rem] bg-gradient-to-b from-background/20 to-transparent opacity-60" />
                 <img
                   src={markAsset.url}
                   alt="Jeevan Raksha emblem — emergency response for women and elders"
-                  className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[22rem] md:h-[22rem] object-contain"
+                  className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[22rem] md:h-[22rem] object-contain rounded-[2.5rem] ring-1 ring-background/20 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7),inset_0_1px_0_hsl(var(--background)/0.25)]"
                 />
+                <div className="pointer-events-none absolute inset-0 rounded-[2.5rem] bg-[linear-gradient(115deg,hsl(var(--background)/0.28)_0%,transparent_38%,transparent_62%,hsl(var(--background)/0.12)_100%)]" />
               </div>
             </div>
           </div>
