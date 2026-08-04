@@ -1,21 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation } from "lucide-react";
+import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation, Satellite } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { getCurrentPosition, watchPosition, clearWatch } from "@/lib/emergency";
+import { getCurrentPosition } from "@/lib/emergency";
+import { useLiveLocation } from "@/hooks/useLiveLocation";
+import { SafetyMap, type MapMarker, type MapCircle } from "@/components/SafetyMap";
+import { BottomNav } from "@/components/BottomNav";
 
 interface SafeZone { id: string; name: string; lat: number; lng: number; radiusM: number; }
 
 const KEY = "jr_safe_zones";
 
-const distanceM = (a:{lat:number,lng:number}, b:{lat:number,lng:number}) => {
+const distanceM = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const R = 6371000;
-  const dLat = (b.lat-a.lat)*Math.PI/180;
-  const dLng = (b.lng-a.lng)*Math.PI/180;
-  const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
-  return 2*R*Math.asin(Math.sqrt(x));
+  const dLat = (b.lat - a.lat) * Math.PI / 180;
+  const dLng = (b.lng - a.lng) * Math.PI / 180;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+};
+
+const speak = (text: string) => {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1; u.lang = "en-IN";
+    window.speechSynthesis.speak(u);
+  } catch { /* ignore */ }
 };
 
 const SafeZones = () => {
@@ -25,47 +36,78 @@ const SafeZones = () => {
   });
   const [name, setName] = useState("");
   const [radius, setRadius] = useState(200);
-  const [current, setCurrent] = useState<{lat:number,lng:number} | null>(null);
   const [insideId, setInsideId] = useState<string | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const wasInsideRef = useRef<string | null>(null);
+  const firstFixRef = useRef(true);
+
+  // Real-time GPS — every fix, no throttle
+  const { coords, error } = useLiveLocation(0);
+  const current = coords ? { lat: coords.lat, lng: coords.lng } : null;
 
   useEffect(() => { localStorage.setItem(KEY, JSON.stringify(zones)); }, [zones]);
+  useEffect(() => { if (coords) setLastUpdate(new Date()); }, [coords]);
 
-  useEffect(() => {
-    const id = watchPosition((p) => setCurrent({ lat: p.coords.latitude, lng: p.coords.longitude }));
-    return () => clearWatch(id);
-  }, []);
-
+  // Live geofence evaluation on every position update
   useEffect(() => {
     if (!current) return;
-    const hit = zones.find(z => distanceM(current, z) <= z.radiusM);
+    const hit = zones.find((z) => distanceM(current, z) <= z.radiusM);
     const newId = hit?.id ?? null;
-    if (newId !== insideId) {
-      if (newId && newId !== wasInsideRef.current) toast.success(`Entered safe zone: ${hit!.name}`);
-      if (!newId && wasInsideRef.current) toast.warning(`Left safe zone — stay alert`);
-      wasInsideRef.current = newId;
+    if (newId === wasInsideRef.current) return;
+
+    const wasFirst = firstFixRef.current;
+    firstFixRef.current = false;
+
+    if (newId && hit) {
       setInsideId(newId);
+      wasInsideRef.current = newId;
+      if (!wasFirst) {
+        toast.success(`Entered safe zone: ${hit.name}`);
+        navigator.vibrate?.(120);
+        speak(`You have entered ${hit.name}. You are safe.`);
+      }
+      return;
     }
-  }, [current, zones, insideId]);
+
+    setInsideId(null);
+    const prevZone = zones.find((z) => z.id === wasInsideRef.current);
+    wasInsideRef.current = null;
+    if (prevZone && !wasFirst) {
+      toast.warning(`Left ${prevZone.name} — stay alert`);
+      navigator.vibrate?.([100, 60, 100]);
+      speak(`You have left ${prevZone.name}. Stay alert.`);
+    }
+  }, [current?.lat, current?.lng, zones]);
 
   const addHere = async () => {
     if (!name.trim()) return toast.error("Enter zone name");
     try {
-      const p = await getCurrentPosition();
-      const z: SafeZone = { id: crypto.randomUUID(), name: name.trim(), lat: p.coords.latitude, lng: p.coords.longitude, radiusM: radius };
+      const p = current ?? (await getCurrentPosition().then((r) => ({ lat: r.coords.latitude, lng: r.coords.longitude })));
+      const z: SafeZone = { id: crypto.randomUUID(), name: name.trim(), lat: p.lat, lng: p.lng, radiusM: radius };
       setZones([z, ...zones]);
       setName("");
+      firstFixRef.current = true;
       toast.success(`Saved ${z.name}`);
     } catch { toast.error("Couldn't get location"); }
   };
 
-  const remove = (id: string) => setZones(zones.filter(z => z.id !== id));
+  const remove = useCallback((id: string) => setZones((z) => z.filter((x) => x.id !== id)), []);
 
   const insideZone = zones.find((z) => z.id === insideId) ?? null;
   const ranked = current
     ? [...zones].map((z) => ({ ...z, dist: distanceM(current, z) })).sort((a, b) => a.dist - b.dist)
     : zones.map((z) => ({ ...z, dist: null as number | null }));
   const fmt = (m: number) => (m < 1000 ? `${Math.round(m)} m away` : `${(m / 1000).toFixed(1)} km away`);
+
+  const circles: MapCircle[] = useMemo(
+    () => zones.map((z) => ({ lat: z.lat, lng: z.lng, radiusKm: z.radiusM / 1000, color: z.id === insideId ? "#16a34a" : "#2563eb" })),
+    [zones, insideId],
+  );
+  const markers: MapMarker[] = useMemo(() => {
+    const list: MapMarker[] = zones.map((z) => ({ lat: z.lat, lng: z.lng, title: z.name, color: "#2563eb" }));
+    if (current) list.push({ lat: current.lat, lng: current.lng, title: "You are here", color: "#dc2626" });
+    return list;
+  }, [zones, current?.lat, current?.lng]);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -74,7 +116,7 @@ const SafeZones = () => {
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-lg bg-background/20 flex items-center justify-center"><ArrowLeft className="w-5 h-5" /></button>
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2"><MapPinned className="w-5 h-5" /> Safe Zones</h1>
-            <p className="text-xs opacity-85">Home, office, college — meeru safe ga unnara ani check chestundi</p>
+            <p className="text-xs opacity-85">Live geofencing — real-time entry & exit alerts</p>
           </div>
         </div>
       </header>
@@ -96,10 +138,20 @@ const SafeZones = () => {
               </p>
             </>
           )}
+          <p className="text-[11px] text-muted-foreground mt-2 flex items-center justify-center gap-1">
+            <span className={`w-2 h-2 rounded-full ${coords ? "bg-secondary animate-pulse" : "bg-muted-foreground"}`} />
+            {error
+              ? error
+              : coords
+                ? `Live GPS · ±${Math.round(coords.accuracy)}m${lastUpdate ? ` · updated ${lastUpdate.toLocaleTimeString()}` : ""}`
+                : "Getting live location…"}
+          </p>
         </div>
 
+        <SafetyMap center={current} markers={markers} circles={circles} zoom={15} className="h-64" />
+
         <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-          <p className="text-sm font-semibold">Add current location as safe zone</p>
+          <p className="text-sm font-semibold flex items-center gap-2"><Satellite className="w-4 h-4 text-secondary" /> Add current location as safe zone</p>
           <div className="flex flex-wrap gap-2">
             {["Home", "Office", "College", "Hostel"].map((p) => (
               <button
@@ -119,7 +171,7 @@ const SafeZones = () => {
 
         <div className="space-y-2">
           {zones.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No safe zones yet</p>}
-          {ranked.map(z => (
+          {ranked.map((z) => (
             <div key={z.id} className={`bg-card border rounded-2xl p-4 flex items-center justify-between ${z.id === insideId ? "border-secondary" : "border-border"}`}>
               <div className="min-w-0">
                 <p className="font-semibold text-sm flex items-center gap-2">
@@ -140,9 +192,9 @@ const SafeZones = () => {
           ))}
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 };
-
 
 export default SafeZones;
