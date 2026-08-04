@@ -130,6 +130,23 @@
 }
 .animate-sos-pulse { animation: sos-pulse 1.8s ease-out infinite; }
 
+/* 3D floating brand mark */
+@keyframes mark-float {
+  0%, 100% { transform: translateY(-6px) rotateX(8deg) rotateY(-10deg); }
+  50% { transform: translateY(6px) rotateX(-6deg) rotateY(10deg); }
+}
+.mark-3d-scene { perspective: 1100px; }
+.mark-3d {
+  transform-style: preserve-3d;
+  animation: mark-float 7s ease-in-out infinite;
+  filter: drop-shadow(0 30px 45px hsl(0 84% 55% / 0.45)) drop-shadow(0 10px 20px hsl(218 89% 45% / 0.35));
+  will-change: transform;
+}
+.mark-3d-plate {
+  transform: translateZ(-60px) scale(0.92);
+  background: radial-gradient(circle at 50% 40%, hsl(0 84% 55% / 0.45), transparent 70%);
+}
+
 @keyframes siren-flash {
   0%, 49% { background-color: hsl(0 84% 55%); }
   50%, 100% { background-color: hsl(218 89% 45%); }
