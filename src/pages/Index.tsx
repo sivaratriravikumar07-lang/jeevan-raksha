@@ -1,17 +1,22 @@
 import { Link } from "react-router-dom";
-import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, Heart } from "lucide-react";
+import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import heroLogoAsset from "@/assets/jeevan-raksha-hero-logo.jpg.asset.json";
-
+import markAsset from "@/assets/jeevan-raksha-mark.jpg.asset.json";
 
 const features = [
-  { icon: Zap, title: "One-Tap SOS", desc: "Instantly alert your trusted circle with a single press." },
-  { icon: MapPin, title: "Live GPS Sharing", desc: "Real-time location streamed to family and authorities." },
-  { icon: Mic, title: "Voice Activation", desc: "Say \"Help Me\" and Jeevan Raksha takes action." },
-  { icon: Bell, title: "Multi-Channel Alerts", desc: "Notifications via app, email, and push." },
-  { icon: Users, title: "Trusted Contacts", desc: "Manage who gets alerted in an emergency." },
-  { icon: Shield, title: "Police & Hospital Network", desc: "Direct routing to nearest verified responders." },
+  { icon: Zap, title: "One-Tap SOS", desc: "Hold once — your trusted circle, police and hospitals are alerted together." },
+  { icon: MapPin, title: "Live GPS Stream", desc: "Your moving location shared on a live link until you're safe." },
+  { icon: Mic, title: "Voice & Sound Shield", desc: "Say \"Help Me\" or let crash/scream detection trigger it for you." },
+  { icon: Bell, title: "Auto SMS + Call 100", desc: "Location SMS to every contact, then a direct police call in 15s." },
+  { icon: Users, title: "Guardian Circle", desc: "Trips, check-in timers and geofences watched by the people you trust." },
+  { icon: Shield, title: "Responder Network", desc: "Nearest verified police stations and hospitals, live distance and ETA." },
+];
+
+const stats = [
+  { value: "15s", label: "to auto police call" },
+  { value: "24/7", label: "listening for distress" },
+  { value: "100+", label: "cities covered live" },
 ];
 
 const Index = () => {
@@ -20,78 +25,103 @@ const Index = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container flex items-center justify-between gap-2 h-16 min-w-0">
-          <Link to="/" className="flex items-center gap-2 min-w-0">
-            <Logo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 shadow-emergency" />
+          <Link to="/" className="flex items-center gap-2.5 min-w-0">
+            <Logo className="w-9 h-9 shrink-0" />
             <span className="font-bold text-base sm:text-lg tracking-tight truncate">Jeevan Raksha</span>
           </Link>
-
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <Link to="/auth"><Button variant="ghost" size="sm" className="px-2 sm:px-3">Login</Button></Link>
             <Link to="/auth?mode=signup"><Button size="sm" className="px-3 bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
           </div>
         </div>
-
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div className="container relative py-8 sm:py-12 md:py-20">
-          <div className="max-w-2xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
-              <Heart className="w-3.5 h-3.5" /> India's Women Safety Companion
-            </div>
+      {/* Hero — dark editorial band */}
+      <section className="relative overflow-hidden bg-foreground text-background">
+        <div
+          className="absolute inset-0 opacity-[0.14]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, hsl(var(--background)/0.35) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--background)/0.35) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+        />
+        <div className="absolute -top-24 -left-20 w-72 h-72 rounded-full bg-gradient-emergency opacity-40 blur-[90px]" />
+        <div className="absolute -bottom-28 -right-16 w-80 h-80 rounded-full bg-gradient-trust opacity-40 blur-[100px]" />
 
-            {/* Hero brand image */}
-            <div className="flex justify-center py-2">
-              <div className="relative group">
-                <div className="absolute -inset-4 bg-gradient-emergency rounded-full opacity-25 blur-3xl group-hover:opacity-35 transition-opacity" />
-                <div className="absolute -inset-1 bg-gradient-to-br from-red-500/20 to-blue-600/20 rounded-[2.5rem] blur-xl" />
-                <img
-                  src={heroLogoAsset.url}
-                  alt="Jeevan Raksha — India's Women Safety Companion"
-                  className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-80 md:h-80 object-contain drop-shadow-2xl"
-                />
+        <div className="container relative py-12 md:py-20">
+          <div className="grid md:grid-cols-[1.05fr_0.95fr] gap-10 md:gap-8 items-center">
+            <div className="space-y-6 order-2 md:order-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/25 text-[11px] font-semibold uppercase tracking-[0.18em]">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> India's Women Safety Companion
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.02]">
+                Safety in
+                <span className="text-gradient-emergency"> one tap.</span>
+                <br />
+                Help in
+                <span className="text-gradient-trust"> seconds.</span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-background/70 max-w-md">
+                Real-time SOS, live GPS, voice activation and a direct line to police and hospitals — working even when you can't reach your phone.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link to="/auth?mode=signup" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
+                    <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
+                  </Button>
+                </Link>
+                <Link to="/auth" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background">
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-background/15 max-w-md">
+                {stats.map((s) => (
+                  <div key={s.label}>
+                    <div className="text-2xl font-extrabold">{s.value}</div>
+                    <div className="text-[11px] uppercase tracking-wider text-background/55 leading-tight">{s.label}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight break-words">
-              Safety in <span className="text-gradient-emergency">one tap.</span>
-              <br />
-              Help in <span className="text-gradient-trust">seconds.</span>
-            </h1>
-
-            <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto">
-              Jeevan Raksha protects women with real-time SOS alerts, live GPS sharing, voice activation, and direct lines to police and hospitals.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
-              <Link to="/auth?mode=signup" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
-                  <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
-                </Button>
-              </Link>
-              <Link to="/auth" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8">Sign In</Button>
-              </Link>
+            {/* Brand mark */}
+            <div className="order-1 md:order-2 flex justify-center">
+              <div className="relative">
+                <div className="absolute -inset-6 bg-gradient-hero rounded-full opacity-30 blur-3xl" />
+                <div className="absolute -inset-3 rounded-[3rem] border border-background/15" />
+                <img
+                  src={markAsset.url}
+                  alt="Jeevan Raksha emblem — emergency response for women and elders"
+                  className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[22rem] md:h-[22rem] object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="container py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Built for emergencies that can't wait</h2>
-          <p className="text-muted-foreground">Every feature designed to reach help fast.</p>
+      {/* Features — numbered editorial list */}
+      <section className="container py-16 md:py-24">
+        <div className="max-w-2xl mb-10">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-3">What you get</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">Built for emergencies that can't wait.</h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((f) => (
-            <div key={f.title} className="p-6 rounded-2xl bg-gradient-card border border-border shadow-card hover:shadow-elevated transition-all hover:-translate-y-1">
-              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-4">
-                <f.icon className="w-6 h-6 text-secondary" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">{f.title}</h3>
-              <p className="text-sm text-muted-foreground">{f.desc}</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-3xl overflow-hidden border border-border">
+          {features.map((f, i) => (
+            <div key={f.title} className="group relative bg-card p-7 hover:bg-accent/50 transition-colors">
+              <span className="absolute top-6 right-6 text-xs font-mono text-muted-foreground">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <f.icon className="w-6 h-6 text-primary mb-5" />
+              <h3 className="font-bold text-lg mb-1.5">{f.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -99,14 +129,17 @@ const Index = () => {
 
       {/* CTA */}
       <section className="container pb-20">
-        <div className="rounded-3xl bg-gradient-trust p-8 md:p-12 text-center shadow-trust">
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-3">Your safety, our promise.</h2>
-          <p className="text-secondary-foreground/90 mb-6 max-w-xl mx-auto">Join thousands of women using Jeevan Raksha to stay protected, every day, everywhere.</p>
-          <Link to="/auth?mode=signup">
-            <Button size="lg" variant="secondary" className="h-12 px-8 bg-background text-foreground hover:bg-background/90">
-              Create Free Account
-            </Button>
-          </Link>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-trust p-8 md:p-14 shadow-trust">
+          <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary/30 blur-3xl" />
+          <div className="relative max-w-xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-3">Your safety, our promise.</h2>
+            <p className="text-secondary-foreground/85 mb-7">Join thousands of women using Jeevan Raksha to stay protected, every day, everywhere.</p>
+            <Link to="/auth?mode=signup">
+              <Button size="lg" variant="secondary" className="h-12 px-8 bg-background text-foreground hover:bg-background/90">
+                Create Free Account <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/jeevan-raksha-logo.jpg.asset.json";
+import logoAsset from "@/assets/jeevan-raksha-mark.jpg.asset.json";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -12,7 +12,7 @@ export const Logo = ({ className, alt = "Jeevan Raksha logo" }: LogoProps) => (
     src={logoAsset.url}
     alt={alt}
     loading="lazy"
-    className={cn("object-contain rounded-xl bg-foreground/90", className)}
+    className={cn("object-contain rounded-xl bg-foreground", className)}
   />
 );
 
