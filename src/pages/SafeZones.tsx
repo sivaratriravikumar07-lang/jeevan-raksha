@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getCurrentPosition } from "@/lib/emergency";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 import { SafetyMap, type MapMarker, type MapCircle } from "@/components/SafetyMap";
+import { PlaceSearch, type PlaceResult } from "@/components/PlaceSearch";
 import { BottomNav } from "@/components/BottomNav";
 import { sendZoneExitAlert } from "@/lib/zoneAlert";
 
@@ -40,6 +41,8 @@ const SafeZones = () => {
   });
   const [name, setName] = useState("");
   const [radius, setRadius] = useState(200);
+  const [mode, setMode] = useState<"here" | "search">("here");
+  const [picked, setPicked] = useState<PlaceResult | null>(null);
   const [insideId, setInsideId] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [exitAlert, setExitAlert] = useState<boolean>(() => localStorage.getItem(ALERT_KEY) !== "0");
@@ -112,11 +115,15 @@ const SafeZones = () => {
 
   const addHere = async () => {
     if (!name.trim()) return toast.error("Enter zone name");
+    if (mode === "search" && !picked) return toast.error("Search and select a place first");
     try {
-      const p = current ?? (await getCurrentPosition().then((r) => ({ lat: r.coords.latitude, lng: r.coords.longitude })));
+      const p = mode === "search" && picked
+        ? { lat: picked.lat, lng: picked.lng }
+        : current ?? (await getCurrentPosition().then((r) => ({ lat: r.coords.latitude, lng: r.coords.longitude })));
       const z: SafeZone = { id: crypto.randomUUID(), name: name.trim(), lat: p.lat, lng: p.lng, radiusM: radius };
       setZones([z, ...zones]);
       setName("");
+      setPicked(null);
       firstFixRef.current = true;
       toast.success(`Saved ${z.name}`);
     } catch { toast.error("Couldn't get location"); }
@@ -206,9 +213,36 @@ const SafeZones = () => {
         <SafetyMap center={current} markers={markers} circles={circles} zoom={15} className="h-64" />
 
         <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-          <p className="text-sm font-semibold flex items-center gap-2"><Satellite className="w-4 h-4 text-secondary" /> Add current location as safe zone</p>
+          <p className="text-sm font-semibold flex items-center gap-2"><Satellite className="w-4 h-4 text-secondary" /> Add a safe zone</p>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => { setMode("here"); setPicked(null); }}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors ${mode === "here" ? "bg-secondary text-secondary-foreground border-secondary" : "bg-muted/50 border-border"}`}
+            >📍 Current place</button>
+            <button
+              onClick={() => setMode("search")}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors ${mode === "search" ? "bg-secondary text-secondary-foreground border-secondary" : "bg-muted/50 border-border"}`}
+            >🎯 Destination place</button>
+          </div>
+
+          {mode === "search" && (
+            <div className="space-y-2">
+              <PlaceSearch
+                bias={current}
+                placeholder="Search destination (KBN College, Vijayawada…)"
+                onSelect={(p) => { setPicked(p); if (!name.trim()) setName(p.label.split(",")[0]); toast.success("Place selected"); }}
+              />
+              {picked && (
+                <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
+                  Selected: <span className="font-medium text-foreground">{picked.label}</span>
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2">
-            {["Home", "Office", "College", "Hostel"].map((p) => (
+            {["Home", "Office", "College", "Hostel", "Destination"].map((p) => (
               <button
                 key={p}
                 onClick={() => setName(p)}
@@ -221,7 +255,9 @@ const SafeZones = () => {
             <label className="text-xs text-muted-foreground">Radius: {radius} m</label>
             <input type="range" min={50} max={1000} step={50} value={radius} onChange={(e) => setRadius(+e.target.value)} className="w-full" />
           </div>
-          <Button onClick={addHere} className="w-full"><Plus className="w-4 h-4 mr-2" /> Save Here</Button>
+          <Button onClick={addHere} className="w-full">
+            <Plus className="w-4 h-4 mr-2" /> {mode === "search" ? "Save selected place" : "Save current place"}
+          </Button>
         </div>
 
         <div className="space-y-2">

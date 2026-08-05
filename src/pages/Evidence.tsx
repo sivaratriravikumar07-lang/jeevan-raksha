@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { isEmbeddedFrame, openCurrentPageInFullTab } from "@/lib/microphone";
 
 interface Item { name: string; url: string; type: "image" | "video"; created: string; size: number }
 type Filter = "all" | "image" | "video";
@@ -32,6 +33,7 @@ const Evidence = () => {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<Item | null>(null);
+  const [camErr, setCamErr] = useState<string | null>(null);
 
   const loadItems = async () => {
     if (!user) return;
@@ -61,14 +63,46 @@ const Evidence = () => {
   useEffect(() => { loadItems(); /* eslint-disable-next-line */ }, [user]);
 
   const startCam = async (mode: "environment" | "user" = facing) => {
+    setCamErr(null);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCamErr("This browser does not support camera access.");
+      return;
+    }
+    if (!window.isSecureContext) {
+      setCamErr("Camera works only on secure HTTPS pages.");
+      return;
+    }
     try {
       streamRef.current?.getTracks().forEach((t) => t.stop());
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: true });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: true });
+      } catch (inner: any) {
+        // Mic may be blocked separately — still allow silent video/photo evidence.
+        if (inner?.name === "NotAllowedError" || inner?.name === "NotFoundError") {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: false });
+          toast.info("Mic blocked — recording without audio.");
+        } else throw inner;
+      }
       streamRef.current = stream;
       setCamOn(true);
       setFacing(mode);
       if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
-    } catch (e: any) { toast.error("Camera denied: " + e.message); }
+    } catch (e: any) {
+      const embedded = isEmbeddedFrame();
+      const msg =
+        e?.name === "NotAllowedError"
+          ? embedded
+            ? "Camera blocked inside the preview frame. Open the app in a full tab and allow camera."
+            : "Camera permission denied. Allow camera in your browser site settings (lock icon → Permissions)."
+          : e?.name === "NotFoundError"
+            ? "No camera found on this device."
+            : e?.name === "NotReadableError"
+              ? "Camera is being used by another app. Close it and retry."
+              : "Could not open camera: " + (e?.message ?? "unknown error");
+      setCamErr(msg);
+      toast.error(msg);
+    }
   };
 
   const closeCamera = () => {
@@ -182,7 +216,7 @@ const Evidence = () => {
           </div>
           <div className="p-3 grid grid-cols-3 gap-2">
             {!camOn ? (
-              <Button onClick={() => startCam()} className="col-span-3"><Camera className="w-4 h-4 mr-2" />Open Camera</Button>
+              <Button onClick={() => startCam()} className="col-span-3"><Camera className="w-4 h-4 mr-2" />Allow & Open Camera</Button>
             ) : (
               <>
                 <Button onClick={snapPhoto} disabled={busy || recording}>
@@ -197,6 +231,16 @@ const Evidence = () => {
               </>
             )}
           </div>
+          {camErr && (
+            <div className="px-3 pb-3 space-y-2">
+              <p className="text-xs text-primary">{camErr}</p>
+              {isEmbeddedFrame() && (
+                <Button size="sm" variant="outline" className="w-full" onClick={openCurrentPageInFullTab}>
+                  Open in full tab to allow camera
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
