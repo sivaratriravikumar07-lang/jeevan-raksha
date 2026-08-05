@@ -115,11 +115,15 @@ const SafeZones = () => {
 
   const addHere = async () => {
     if (!name.trim()) return toast.error("Enter zone name");
+    if (mode === "search" && !picked) return toast.error("Search and select a place first");
     try {
-      const p = current ?? (await getCurrentPosition().then((r) => ({ lat: r.coords.latitude, lng: r.coords.longitude })));
+      const p = mode === "search" && picked
+        ? { lat: picked.lat, lng: picked.lng }
+        : current ?? (await getCurrentPosition().then((r) => ({ lat: r.coords.latitude, lng: r.coords.longitude })));
       const z: SafeZone = { id: crypto.randomUUID(), name: name.trim(), lat: p.lat, lng: p.lng, radiusM: radius };
       setZones([z, ...zones]);
       setName("");
+      setPicked(null);
       firstFixRef.current = true;
       toast.success(`Saved ${z.name}`);
     } catch { toast.error("Couldn't get location"); }
