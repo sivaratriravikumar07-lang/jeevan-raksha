@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getCurrentPosition } from "@/lib/emergency";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 import { SafetyMap, type MapMarker, type MapCircle } from "@/components/SafetyMap";
+import { PlaceSearch, type PlaceResult } from "@/components/PlaceSearch";
 import { BottomNav } from "@/components/BottomNav";
 import { sendZoneExitAlert } from "@/lib/zoneAlert";
 
