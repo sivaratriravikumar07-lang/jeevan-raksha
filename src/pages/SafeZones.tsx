@@ -41,6 +41,8 @@ const SafeZones = () => {
   });
   const [name, setName] = useState("");
   const [radius, setRadius] = useState(200);
+  const [mode, setMode] = useState<"here" | "search">("here");
+  const [picked, setPicked] = useState<PlaceResult | null>(null);
   const [insideId, setInsideId] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [exitAlert, setExitAlert] = useState<boolean>(() => localStorage.getItem(ALERT_KEY) !== "0");
