@@ -179,6 +179,30 @@ const SafeZones = () => {
           </p>
         </div>
 
+        {/* Auto exit alert */}
+        <div className="bg-card border border-border rounded-2xl p-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold flex items-center gap-2">
+              <BellRing className="w-4 h-4 text-primary" /> Auto-alert on leaving a zone
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Safe zone dhati bayatiki velthe, emergency contacts andariki live location tho SMS auto ga velthundi.
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {alerting ? "Sending alert…" : lastAlert ? `Last alert: ${lastAlert}` : "No exit alert sent yet"}
+            </p>
+            {insideZone && exitAlert && (
+              <button
+                onClick={() => fireExitAlert(insideZone.name, current)}
+                className="text-[11px] font-semibold text-secondary underline mt-1"
+              >Test alert now</button>
+            )}
+          </div>
+          <Switch checked={exitAlert} onCheckedChange={setExitAlert} />
+        </div>
+
+
+
         <SafetyMap center={current} markers={markers} circles={circles} zoom={15} className="h-64" />
 
         <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
