@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { isEmbeddedFrame, openCurrentPageInFullTab } from "@/lib/microphone";
 
 interface Item { name: string; url: string; type: "image" | "video"; created: string; size: number }
 type Filter = "all" | "image" | "video";
@@ -32,6 +33,7 @@ const Evidence = () => {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<Item | null>(null);
+  const [camErr, setCamErr] = useState<string | null>(null);
 
   const loadItems = async () => {
     if (!user) return;
@@ -214,7 +216,7 @@ const Evidence = () => {
           </div>
           <div className="p-3 grid grid-cols-3 gap-2">
             {!camOn ? (
-              <Button onClick={() => startCam()} className="col-span-3"><Camera className="w-4 h-4 mr-2" />Open Camera</Button>
+              <Button onClick={() => startCam()} className="col-span-3"><Camera className="w-4 h-4 mr-2" />Allow & Open Camera</Button>
             ) : (
               <>
                 <Button onClick={snapPhoto} disabled={busy || recording}>
@@ -229,6 +231,16 @@ const Evidence = () => {
               </>
             )}
           </div>
+          {camErr && (
+            <div className="px-3 pb-3 space-y-2">
+              <p className="text-xs text-primary">{camErr}</p>
+              {isEmbeddedFrame() && (
+                <Button size="sm" variant="outline" className="w-full" onClick={openCurrentPageInFullTab}>
+                  Open in full tab to allow camera
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
