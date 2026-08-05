@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation, Satellite } from "lucide-react";
+import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation, Satellite, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { getCurrentPosition } from "@/lib/emergency";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 import { SafetyMap, type MapMarker, type MapCircle } from "@/components/SafetyMap";
 import { BottomNav } from "@/components/BottomNav";
+import { sendZoneExitAlert } from "@/lib/zoneAlert";
 
 interface SafeZone { id: string; name: string; lat: number; lng: number; radiusM: number; }
 
 const KEY = "jr_safe_zones";
+const ALERT_KEY = "jr_safe_zone_exit_alert";
+
 
 const distanceM = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const R = 6371000;
@@ -38,8 +42,13 @@ const SafeZones = () => {
   const [radius, setRadius] = useState(200);
   const [insideId, setInsideId] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [exitAlert, setExitAlert] = useState<boolean>(() => localStorage.getItem(ALERT_KEY) !== "0");
+  const [alerting, setAlerting] = useState(false);
+  const [lastAlert, setLastAlert] = useState<string | null>(null);
   const wasInsideRef = useRef<string | null>(null);
   const firstFixRef = useRef(true);
+  const exitAlertRef = useRef(exitAlert);
+  useEffect(() => { exitAlertRef.current = exitAlert; localStorage.setItem(ALERT_KEY, exitAlert ? "1" : "0"); }, [exitAlert]);
 
   // Real-time GPS — every fix, no throttle
   const { coords, error } = useLiveLocation(0);
@@ -47,6 +56,26 @@ const SafeZones = () => {
 
   useEffect(() => { localStorage.setItem(KEY, JSON.stringify(zones)); }, [zones]);
   useEffect(() => { if (coords) setLastUpdate(new Date()); }, [coords]);
+
+  const fireExitAlert = useCallback(async (zoneName: string, at: { lat: number; lng: number } | null) => {
+    setAlerting(true);
+    try {
+      const res = await sendZoneExitAlert(zoneName, at);
+      if (!res.contacts) {
+        toast.error("No emergency contacts saved — add contacts to get exit alerts.");
+      } else if (res.autoSent) {
+        toast.success(`Alert SMS sent to ${res.autoSent} contact${res.autoSent > 1 ? "s" : ""} with live location.`);
+        setLastAlert(`${zoneName} · ${new Date().toLocaleTimeString()}`);
+      } else {
+        toast.info(`SMS app opened for ${res.contacts} contact${res.contacts > 1 ? "s" : ""} — press send.`);
+        setLastAlert(`${zoneName} · ${new Date().toLocaleTimeString()}`);
+      }
+    } catch (e: any) {
+      toast.error("Alert failed: " + (e?.message ?? "unknown error"));
+    } finally {
+      setAlerting(false);
+    }
+  }, []);
 
   // Live geofence evaluation on every position update
   useEffect(() => {
@@ -75,9 +104,11 @@ const SafeZones = () => {
     if (prevZone && !wasFirst) {
       toast.warning(`Left ${prevZone.name} — stay alert`);
       navigator.vibrate?.([100, 60, 100]);
-      speak(`You have left ${prevZone.name}. Stay alert.`);
+      speak(`You have left ${prevZone.name}. Alerting your emergency contacts.`);
+      if (exitAlertRef.current) fireExitAlert(prevZone.name, current);
     }
-  }, [current?.lat, current?.lng, zones]);
+  }, [current?.lat, current?.lng, zones, fireExitAlert]);
+
 
   const addHere = async () => {
     if (!name.trim()) return toast.error("Enter zone name");
@@ -147,6 +178,30 @@ const SafeZones = () => {
                 : "Getting live location…"}
           </p>
         </div>
+
+        {/* Auto exit alert */}
+        <div className="bg-card border border-border rounded-2xl p-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold flex items-center gap-2">
+              <BellRing className="w-4 h-4 text-primary" /> Auto-alert on leaving a zone
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Safe zone dhati bayatiki velthe, emergency contacts andariki live location tho SMS auto ga velthundi.
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              {alerting ? "Sending alert…" : lastAlert ? `Last alert: ${lastAlert}` : "No exit alert sent yet"}
+            </p>
+            {insideZone && exitAlert && (
+              <button
+                onClick={() => fireExitAlert(insideZone.name, current)}
+                className="text-[11px] font-semibold text-secondary underline mt-1"
+              >Test alert now</button>
+            )}
+          </div>
+          <Switch checked={exitAlert} onCheckedChange={setExitAlert} />
+        </div>
+
+
 
         <SafetyMap center={current} markers={markers} circles={circles} zoom={15} className="h-64" />
 
