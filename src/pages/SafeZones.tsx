@@ -42,8 +42,13 @@ const SafeZones = () => {
   const [radius, setRadius] = useState(200);
   const [insideId, setInsideId] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [exitAlert, setExitAlert] = useState<boolean>(() => localStorage.getItem(ALERT_KEY) !== "0");
+  const [alerting, setAlerting] = useState(false);
+  const [lastAlert, setLastAlert] = useState<string | null>(null);
   const wasInsideRef = useRef<string | null>(null);
   const firstFixRef = useRef(true);
+  const exitAlertRef = useRef(exitAlert);
+  useEffect(() => { exitAlertRef.current = exitAlert; localStorage.setItem(ALERT_KEY, exitAlert ? "1" : "0"); }, [exitAlert]);
 
   // Real-time GPS — every fix, no throttle
   const { coords, error } = useLiveLocation(0);
@@ -51,6 +56,26 @@ const SafeZones = () => {
 
   useEffect(() => { localStorage.setItem(KEY, JSON.stringify(zones)); }, [zones]);
   useEffect(() => { if (coords) setLastUpdate(new Date()); }, [coords]);
+
+  const fireExitAlert = useCallback(async (zoneName: string, at: { lat: number; lng: number } | null) => {
+    setAlerting(true);
+    try {
+      const res = await sendZoneExitAlert(zoneName, at);
+      if (!res.contacts) {
+        toast.error("No emergency contacts saved — add contacts to get exit alerts.");
+      } else if (res.autoSent) {
+        toast.success(`Alert SMS sent to ${res.autoSent} contact${res.autoSent > 1 ? "s" : ""} with live location.`);
+        setLastAlert(`${zoneName} · ${new Date().toLocaleTimeString()}`);
+      } else {
+        toast.info(`SMS app opened for ${res.contacts} contact${res.contacts > 1 ? "s" : ""} — press send.`);
+        setLastAlert(`${zoneName} · ${new Date().toLocaleTimeString()}`);
+      }
+    } catch (e: any) {
+      toast.error("Alert failed: " + (e?.message ?? "unknown error"));
+    } finally {
+      setAlerting(false);
+    }
+  }, []);
 
   // Live geofence evaluation on every position update
   useEffect(() => {
@@ -79,9 +104,11 @@ const SafeZones = () => {
     if (prevZone && !wasFirst) {
       toast.warning(`Left ${prevZone.name} — stay alert`);
       navigator.vibrate?.([100, 60, 100]);
-      speak(`You have left ${prevZone.name}. Stay alert.`);
+      speak(`You have left ${prevZone.name}. Alerting your emergency contacts.`);
+      if (exitAlertRef.current) fireExitAlert(prevZone.name, current);
     }
-  }, [current?.lat, current?.lng, zones]);
+  }, [current?.lat, current?.lng, zones, fireExitAlert]);
+
 
   const addHere = async () => {
     if (!name.trim()) return toast.error("Enter zone name");
