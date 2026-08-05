@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation, Satellite } from "lucide-react";
+import { ArrowLeft, MapPinned, Plus, Trash2, Home, ShieldAlert, Navigation, Satellite, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { getCurrentPosition } from "@/lib/emergency";
 import { useLiveLocation } from "@/hooks/useLiveLocation";
 import { SafetyMap, type MapMarker, type MapCircle } from "@/components/SafetyMap";
 import { BottomNav } from "@/components/BottomNav";
+import { sendZoneExitAlert } from "@/lib/zoneAlert";
 
 interface SafeZone { id: string; name: string; lat: number; lng: number; radiusM: number; }
 
 const KEY = "jr_safe_zones";
+const ALERT_KEY = "jr_safe_zone_exit_alert";
+
 
 const distanceM = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const R = 6371000;
