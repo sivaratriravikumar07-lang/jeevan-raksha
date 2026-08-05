@@ -61,14 +61,46 @@ const Evidence = () => {
   useEffect(() => { loadItems(); /* eslint-disable-next-line */ }, [user]);
 
   const startCam = async (mode: "environment" | "user" = facing) => {
+    setCamErr(null);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCamErr("This browser does not support camera access.");
+      return;
+    }
+    if (!window.isSecureContext) {
+      setCamErr("Camera works only on secure HTTPS pages.");
+      return;
+    }
     try {
       streamRef.current?.getTracks().forEach((t) => t.stop());
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: true });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: true });
+      } catch (inner: any) {
+        // Mic may be blocked separately — still allow silent video/photo evidence.
+        if (inner?.name === "NotAllowedError" || inner?.name === "NotFoundError") {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode }, audio: false });
+          toast.info("Mic blocked — recording without audio.");
+        } else throw inner;
+      }
       streamRef.current = stream;
       setCamOn(true);
       setFacing(mode);
       if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
-    } catch (e: any) { toast.error("Camera denied: " + e.message); }
+    } catch (e: any) {
+      const embedded = isEmbeddedFrame();
+      const msg =
+        e?.name === "NotAllowedError"
+          ? embedded
+            ? "Camera blocked inside the preview frame. Open the app in a full tab and allow camera."
+            : "Camera permission denied. Allow camera in your browser site settings (lock icon → Permissions)."
+          : e?.name === "NotFoundError"
+            ? "No camera found on this device."
+            : e?.name === "NotReadableError"
+              ? "Camera is being used by another app. Close it and retry."
+              : "Could not open camera: " + (e?.message ?? "unknown error");
+      setCamErr(msg);
+      toast.error(msg);
+    }
   };
 
   const closeCamera = () => {
