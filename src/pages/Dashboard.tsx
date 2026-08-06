@@ -33,6 +33,16 @@ const Dashboard = () => {
   const [contactsCount, setContactsCount] = useState(0);
   const [incidentsCount, setIncidentsCount] = useState(0);
   const [showFake, setShowFake] = useState(false);
+  const [permsReady, setPermsReady] = useState(0);
+
+  useEffect(() => {
+    const refresh = () =>
+      readAllPermissions().then((s) =>
+        setPermsReady(Object.values(s).filter((v) => v === "granted" || v === "unsupported").length),
+      );
+    refresh();
+    return watchPermissions(refresh);
+  }, []);
 
   const isResponder = roles.includes("admin") || roles.includes("police") || roles.includes("hospital");
 
