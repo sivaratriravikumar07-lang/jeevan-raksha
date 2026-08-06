@@ -89,6 +89,22 @@ const Dashboard = () => {
       </header>
 
       <main className="container -mt-6 space-y-5">
+        {/* Live access status */}
+        {permsReady < 5 && (
+          <button
+            onClick={() => navigate("/permissions")}
+            className="w-full flex items-center gap-3 p-4 bg-card border border-primary/40 rounded-2xl shadow-card text-left"
+          >
+            <span className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold">Full access ivvandi ({permsReady}/5)</span>
+              <span className="block text-xs text-muted-foreground">GPS, mic, camera, notifications — anni real-time ga pani cheyadaniki</span>
+            </span>
+          </button>
+        )}
+
         {/* SOS Card */}
         <div className="bg-card border border-border rounded-3xl p-6 shadow-elevated text-center">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Emergency SOS · Police 100</p>
