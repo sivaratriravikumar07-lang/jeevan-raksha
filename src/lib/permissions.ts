@@ -90,6 +90,8 @@ export const readAllPermissions = async (): Promise<Record<PermKey, PermState>> 
 const stopStream = (s: MediaStream | null) => s?.getTracks().forEach((t) => t.stop());
 
 export const requestPermission = async (key: PermKey): Promise<PermState> => {
+  const pre = await readPermission(key);
+  if (pre === "frame-blocked" || pre === "unsupported") return pre;
   try {
     switch (key) {
       case "location":
@@ -120,7 +122,10 @@ export const requestPermission = async (key: PermKey): Promise<PermState> => {
         return "granted";
       }
     }
-  } catch {
+  } catch (e: any) {
+    if (e?.name === "NotAllowedError" && isEmbedded() && !featureAllowed(key === "camera" ? "camera" : key === "microphone" ? "microphone" : "geolocation")) {
+      return "frame-blocked";
+    }
     return "denied";
   }
 };
