@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { useVolumeSOS } from "@/hooks/useVolumeSOS";
 import { vibrate } from "@/lib/emergency";
+import { readAllPermissions, watchPermissions } from "@/lib/permissions";
 
 
 interface Profile { full_name: string; phone: string | null; }
@@ -32,6 +33,16 @@ const Dashboard = () => {
   const [contactsCount, setContactsCount] = useState(0);
   const [incidentsCount, setIncidentsCount] = useState(0);
   const [showFake, setShowFake] = useState(false);
+  const [permsReady, setPermsReady] = useState(0);
+
+  useEffect(() => {
+    const refresh = () =>
+      readAllPermissions().then((s) =>
+        setPermsReady(Object.values(s).filter((v) => v === "granted" || v === "unsupported").length),
+      );
+    refresh();
+    return watchPermissions(refresh);
+  }, []);
 
   const isResponder = roles.includes("admin") || roles.includes("police") || roles.includes("hospital");
 
@@ -89,6 +100,22 @@ const Dashboard = () => {
       </header>
 
       <main className="container -mt-6 space-y-5">
+        {/* Live access status */}
+        {permsReady < 5 && (
+          <button
+            onClick={() => navigate("/permissions")}
+            className="w-full flex items-center gap-3 p-4 bg-card border border-primary/40 rounded-2xl shadow-card text-left"
+          >
+            <span className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold">Full access ivvandi ({permsReady}/5)</span>
+              <span className="block text-xs text-muted-foreground">GPS, mic, camera, notifications — anni real-time ga pani cheyadaniki</span>
+            </span>
+          </button>
+        )}
+
         {/* SOS Card */}
         <div className="bg-card border border-border rounded-3xl p-6 shadow-elevated text-center">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Emergency SOS · Police 100</p>
@@ -256,6 +283,10 @@ const Dashboard = () => {
             <button onClick={() => navigate("/calculator")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
               <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><CalcIcon className="w-5 h-5 text-secondary-foreground" /></div>
               <div><div className="font-semibold text-sm">Disguise Mode</div><div className="text-xs text-muted-foreground">Calculator decoy</div></div>
+            </button>
+            <button onClick={() => navigate("/permissions")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><ShieldCheck className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Full Access</div><div className="text-xs text-muted-foreground">{permsReady}/5 permissions</div></div>
             </button>
           </div>
         </section>

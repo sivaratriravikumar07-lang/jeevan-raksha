@@ -35,6 +35,7 @@ import MedicalID from "./pages/MedicalID";
 import DangerZones from "./pages/DangerZones";
 import SafeZones from "./pages/SafeZones";
 import StealthCapture from "./pages/StealthCapture";
+import Permissions from "./pages/Permissions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const App = () => (
             <Route path="/danger-zones" element={<ProtectedRoute><DangerZones /></ProtectedRoute>} />
             <Route path="/safe-zones" element={<ProtectedRoute><SafeZones /></ProtectedRoute>} />
             <Route path="/stealth" element={<ProtectedRoute><StealthCapture /></ProtectedRoute>} />
+            <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
