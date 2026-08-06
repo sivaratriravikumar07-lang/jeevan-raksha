@@ -1,4 +1,10 @@
-export type PermState = "granted" | "denied" | "prompt" | "unsupported" | "unknown";
+export type PermState =
+  | "granted"
+  | "denied"
+  | "prompt"
+  | "unsupported"
+  | "frame-blocked"
+  | "unknown";
 
 export type PermKey = "location" | "microphone" | "camera" | "notifications" | "motion";
 
