@@ -1,0 +1,130 @@
+export type PermState = "granted" | "denied" | "prompt" | "unsupported" | "unknown";
+
+export type PermKey = "location" | "microphone" | "camera" | "notifications" | "motion";
+
+export interface PermInfo {
+  key: PermKey;
+  label: string;
+  why: string;
+}
+
+export const PERMISSIONS: PermInfo[] = [
+  { key: "location", label: "Live Location (GPS)", why: "SOS, safe zones, journey tracking, nearby police & hospitals" },
+  { key: "microphone", label: "Microphone", why: "Voice command 'Help Me' + scream/crash sound detection" },
+  { key: "camera", label: "Camera", why: "Stealth photo & video evidence capture" },
+  { key: "notifications", label: "Notifications", why: "Alerts when you exit a safe zone or a responder replies" },
+  { key: "motion", label: "Motion sensors", why: "Fall / crash detection while travelling" },
+];
+
+const queryPerm = async (name: string): Promise<PermState> => {
+  try {
+    if (!navigator.permissions?.query) return "unknown";
+    const r = await navigator.permissions.query({ name: name as PermissionName });
+    return r.state as PermState;
+  } catch {
+    return "unknown";
+  }
+};
+
+export const isEmbedded = () => {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+};
+
+export const readPermission = async (key: PermKey): Promise<PermState> => {
+  switch (key) {
+    case "location":
+      return "geolocation" in navigator ? queryPerm("geolocation") : "unsupported";
+    case "microphone":
+      return navigator.mediaDevices?.getUserMedia ? queryPerm("microphone") : "unsupported";
+    case "camera":
+      return navigator.mediaDevices?.getUserMedia ? queryPerm("camera") : "unsupported";
+    case "notifications":
+      if (typeof Notification === "undefined") return "unsupported";
+      return Notification.permission === "default" ? "prompt" : (Notification.permission as PermState);
+    case "motion": {
+      const anyDME = (window as any).DeviceMotionEvent;
+      if (!anyDME) return "unsupported";
+      return typeof anyDME.requestPermission === "function" ? "prompt" : "granted";
+    }
+  }
+};
+
+export const readAllPermissions = async (): Promise<Record<PermKey, PermState>> => {
+  const entries = await Promise.all(
+    PERMISSIONS.map(async (p) => [p.key, await readPermission(p.key)] as const),
+  );
+  return Object.fromEntries(entries) as Record<PermKey, PermState>;
+};
+
+const stopStream = (s: MediaStream | null) => s?.getTracks().forEach((t) => t.stop());
+
+export const requestPermission = async (key: PermKey): Promise<PermState> => {
+  try {
+    switch (key) {
+      case "location":
+        await new Promise<void>((res, rej) =>
+          navigator.geolocation.getCurrentPosition(() => res(), rej, { enableHighAccuracy: true, timeout: 15000 }),
+        );
+        return "granted";
+      case "microphone": {
+        const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stopStream(s);
+        return "granted";
+      }
+      case "camera": {
+        const s = await navigator.mediaDevices.getUserMedia({ video: true });
+        stopStream(s);
+        return "granted";
+      }
+      case "notifications": {
+        const r = await Notification.requestPermission();
+        return r === "default" ? "prompt" : (r as PermState);
+      }
+      case "motion": {
+        const anyDME = (window as any).DeviceMotionEvent;
+        if (typeof anyDME?.requestPermission === "function") {
+          const r = await anyDME.requestPermission();
+          return r === "granted" ? "granted" : "denied";
+        }
+        return "granted";
+      }
+    }
+  } catch {
+    return "denied";
+  }
+};
+
+/** Ask for everything, one after another (browsers reject parallel prompts). */
+export const requestAllPermissions = async (
+  onStep?: (key: PermKey, state: PermState) => void,
+): Promise<Record<PermKey, PermState>> => {
+  const out: Partial<Record<PermKey, PermState>> = {};
+  for (const p of PERMISSIONS) {
+    const current = await readPermission(p.key);
+    const state = current === "granted" || current === "unsupported" ? current : await requestPermission(p.key);
+    out[p.key] = state;
+    onStep?.(p.key, state);
+  }
+  return out as Record<PermKey, PermState>;
+};
+
+export const watchPermissions = (onChange: () => void) => {
+  const names = ["geolocation", "microphone", "camera", "notifications"];
+  const cleanups: Array<() => void> = [];
+  names.forEach((n) => {
+    navigator.permissions
+      ?.query({ name: n as PermissionName })
+      .then((r) => {
+        r.addEventListener("change", onChange);
+        cleanups.push(() => r.removeEventListener("change", onChange));
+      })
+      .catch(() => undefined);
+  });
+  return () => cleanups.forEach((c) => c());
+};
+
+export const openInFullTab = () => window.open(window.location.href, "_blank", "noopener,noreferrer");
