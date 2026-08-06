@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 import { useVolumeSOS } from "@/hooks/useVolumeSOS";
 import { vibrate } from "@/lib/emergency";
+import { readAllPermissions, watchPermissions } from "@/lib/permissions";
 
 
 interface Profile { full_name: string; phone: string | null; }
