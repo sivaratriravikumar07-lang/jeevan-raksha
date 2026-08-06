@@ -1,4 +1,10 @@
-export type PermState = "granted" | "denied" | "prompt" | "unsupported" | "unknown";
+export type PermState =
+  | "granted"
+  | "denied"
+  | "prompt"
+  | "unsupported"
+  | "frame-blocked"
+  | "unknown";
 
 export type PermKey = "location" | "microphone" | "camera" | "notifications" | "motion";
 
@@ -34,16 +40,37 @@ export const isEmbedded = () => {
   }
 };
 
+/** Permissions-Policy check — iframes (preview) often block camera/mic/geolocation. */
+export const featureAllowed = (feature: string): boolean => {
+  try {
+    const fp: any = (document as any).featurePolicy || (document as any).permissionsPolicy;
+    if (fp?.allowsFeature) return fp.allowsFeature(feature);
+  } catch {
+    /* noop */
+  }
+  return true;
+};
+
+/** Notifications never work inside a cross-origin iframe. */
+const notificationsBlockedByFrame = () => isEmbedded();
+
 export const readPermission = async (key: PermKey): Promise<PermState> => {
   switch (key) {
     case "location":
-      return "geolocation" in navigator ? queryPerm("geolocation") : "unsupported";
+      if (!("geolocation" in navigator)) return "unsupported";
+      if (!featureAllowed("geolocation")) return "frame-blocked";
+      return queryPerm("geolocation");
     case "microphone":
-      return navigator.mediaDevices?.getUserMedia ? queryPerm("microphone") : "unsupported";
+      if (!navigator.mediaDevices?.getUserMedia) return "unsupported";
+      if (!featureAllowed("microphone")) return "frame-blocked";
+      return queryPerm("microphone");
     case "camera":
-      return navigator.mediaDevices?.getUserMedia ? queryPerm("camera") : "unsupported";
+      if (!navigator.mediaDevices?.getUserMedia) return "unsupported";
+      if (!featureAllowed("camera")) return "frame-blocked";
+      return queryPerm("camera");
     case "notifications":
       if (typeof Notification === "undefined") return "unsupported";
+      if (Notification.permission === "default" && notificationsBlockedByFrame()) return "frame-blocked";
       return Notification.permission === "default" ? "prompt" : (Notification.permission as PermState);
     case "motion": {
       const anyDME = (window as any).DeviceMotionEvent;
@@ -63,6 +90,8 @@ export const readAllPermissions = async (): Promise<Record<PermKey, PermState>> 
 const stopStream = (s: MediaStream | null) => s?.getTracks().forEach((t) => t.stop());
 
 export const requestPermission = async (key: PermKey): Promise<PermState> => {
+  const pre = await readPermission(key);
+  if (pre === "frame-blocked" || pre === "unsupported") return pre;
   try {
     switch (key) {
       case "location":
@@ -93,7 +122,10 @@ export const requestPermission = async (key: PermKey): Promise<PermState> => {
         return "granted";
       }
     }
-  } catch {
+  } catch (e: any) {
+    if (e?.name === "NotAllowedError" && isEmbedded() && !featureAllowed(key === "camera" ? "camera" : key === "microphone" ? "microphone" : "geolocation")) {
+      return "frame-blocked";
+    }
     return "denied";
   }
 };
