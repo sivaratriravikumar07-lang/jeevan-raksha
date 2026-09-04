@@ -27,7 +27,6 @@ import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
 import MicTest from "./pages/MicTest";
 import PanicTimer from "./pages/PanicTimer";
-import Whistle from "./pages/Whistle";
 import FirstAid from "./pages/FirstAid";
 import Chat from "./pages/Chat";
 import Guardian from "./pages/Guardian";
@@ -35,7 +34,6 @@ import Calculator from "./pages/Calculator";
 import MedicalID from "./pages/MedicalID";
 import DangerZones from "./pages/DangerZones";
 import SafeZones from "./pages/SafeZones";
-import StealthCapture from "./pages/StealthCapture";
 import Permissions from "./pages/Permissions";
 import NotFound from "./pages/NotFound";
 
@@ -71,14 +69,12 @@ const App = () => (
             <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
             <Route path="/mic-test" element={<ProtectedRoute><MicTest /></ProtectedRoute>} />
             <Route path="/panic-timer" element={<ProtectedRoute><PanicTimer /></ProtectedRoute>} />
-            <Route path="/whistle" element={<ProtectedRoute><Whistle /></ProtectedRoute>} />
             <Route path="/first-aid" element={<ProtectedRoute><FirstAid /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="/guardian" element={<ProtectedRoute><Guardian /></ProtectedRoute>} />
             <Route path="/medical-id" element={<ProtectedRoute><MedicalID /></ProtectedRoute>} />
             <Route path="/danger-zones" element={<ProtectedRoute><DangerZones /></ProtectedRoute>} />
             <Route path="/safe-zones" element={<ProtectedRoute><SafeZones /></ProtectedRoute>} />
-            <Route path="/stealth" element={<ProtectedRoute><StealthCapture /></ProtectedRoute>} />
             <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />
