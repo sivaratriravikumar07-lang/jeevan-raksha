@@ -6,6 +6,7 @@ import {
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
   Timer, Volume2, HeartPulse, Sparkles,
   ShieldCheck, MapPinned, AlertTriangle, Calculator as CalcIcon, Eye,
+  Baby,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -239,6 +240,10 @@ const Dashboard = () => {
             <button onClick={() => navigate("/women-safety")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
               <div className="w-10 h-10 rounded-xl bg-gradient-emergency flex items-center justify-center shrink-0"><Heart className="w-5 h-5 text-primary-foreground" /></div>
               <div><div className="font-semibold text-sm">Women Mode</div><div className="text-xs text-muted-foreground">1091 · Disha</div></div>
+            </button>
+            <button onClick={() => navigate("/child-safety")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
+              <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><Baby className="w-5 h-5 text-secondary-foreground" /></div>
+              <div><div className="font-semibold text-sm">Child Safety</div><div className="text-xs text-muted-foreground">1098 · Missing alert</div></div>
             </button>
             <button onClick={() => navigate("/offline-sos")} className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl shadow-card text-left hover:border-primary/40">
               <div className="w-10 h-10 rounded-xl bg-gradient-trust flex items-center justify-center shrink-0"><WifiOff className="w-5 h-5 text-secondary-foreground" /></div>

@@ -22,6 +22,7 @@ import ShareLocation from "./pages/ShareLocation";
 import TrackLocation from "./pages/TrackLocation";
 import Journey from "./pages/Journey";
 import WomenSafety from "./pages/WomenSafety";
+import ChildSafety from "./pages/ChildSafety";
 import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
 import MicTest from "./pages/MicTest";
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/track/:token" element={<TrackLocation />} />
             <Route path="/journey" element={<ProtectedRoute><Journey /></ProtectedRoute>} />
             <Route path="/women-safety" element={<ProtectedRoute><WomenSafety /></ProtectedRoute>} />
+            <Route path="/child-safety" element={<ProtectedRoute><ChildSafety /></ProtectedRoute>} />
             <Route path="/offline-sos" element={<ProtectedRoute><OfflineSOS /></ProtectedRoute>} />
             <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
             <Route path="/mic-test" element={<ProtectedRoute><MicTest /></ProtectedRoute>} />
