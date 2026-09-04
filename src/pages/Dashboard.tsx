@@ -6,6 +6,7 @@ import {
   Share2, Navigation, Heart, WifiOff, Camera, Mic,
   Timer, Volume2, HeartPulse, Sparkles,
   ShieldCheck, MapPinned, AlertTriangle, Calculator as CalcIcon, Eye,
+  Baby,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
