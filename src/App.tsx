@@ -22,6 +22,7 @@ import ShareLocation from "./pages/ShareLocation";
 import TrackLocation from "./pages/TrackLocation";
 import Journey from "./pages/Journey";
 import WomenSafety from "./pages/WomenSafety";
+import ChildSafety from "./pages/ChildSafety";
 import OfflineSOS from "./pages/OfflineSOS";
 import Evidence from "./pages/Evidence";
 import MicTest from "./pages/MicTest";
