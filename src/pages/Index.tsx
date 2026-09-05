@@ -146,8 +146,15 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        © 2026 Jeevan Raksha · Protecting women, one tap at a time.
+      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground space-y-2">
+        <div className="flex items-center justify-center gap-4">
+          <Link to="/download" className="hover:text-foreground transition-colors">Download App</Link>
+          <span>·</span>
+          <Link to="/safety-tips" className="hover:text-foreground transition-colors">Safety Tips</Link>
+          <span>·</span>
+          <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">Sign Up</Link>
+        </div>
+        <div>© 2026 Jeevan Raksha · Protecting women, one tap at a time.</div>
       </footer>
     </div>
   );

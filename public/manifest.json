@@ -1,0 +1,24 @@
+{
+  "name": "Jeevan Raksha",
+  "short_name": "JeevanRaksha",
+  "description": "One-tap SOS, live GPS sharing, voice activation, and real-time emergency response for women safety.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#e62e2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
