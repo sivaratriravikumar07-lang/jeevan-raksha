@@ -97,7 +97,7 @@ const Dashboard = () => {
       // Try auto-SMS gateway first
       try {
         const incident = await supabase.from("incidents").insert({
-          user_id: user.id, type: "volume_sos", status: "active",
+          user_id: user.id, type: "sos", status: "active",
           latitude: lat || null, longitude: lng || null,
         }).select().single();
         const { data: smsRes, error: smsErr } = await supabase.functions.invoke("send-sos-sms", {
