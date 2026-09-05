@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">jeevan-raksha</string>
-    <string name="title_activity_main">jeevan-raksha</string>
+    <string name="app_name">Jeevan Raksha</string>
+    <string name="title_activity_main">Jeevan Raksha</string>
     <string name="package_name">app.lovable.p3d70628152cc47c6bee826f8e0319848</string>
     <string name="custom_url_scheme">app.lovable.p3d70628152cc47c6bee826f8e0319848</string>
 </resources>
