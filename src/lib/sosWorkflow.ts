@@ -5,7 +5,7 @@ import { buildEmergencyMessage, openSmsToAll, type ContactLite } from "@/lib/sms
 
 export interface SosOptions {
   /** Incident type stored in the incidents table. */
-  type?: string;
+  type?: "auto_detected" | "manual" | "sos" | "voice";
   /** Emergency number dialled after alerting contacts. */
   callNumber?: string;
   /** Delay before the dialler opens. */
