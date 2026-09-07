@@ -17,10 +17,17 @@ export interface SosOptions {
  * the native Voice Protection Mode: GPS → Google Maps link → contact alerts →
  * emergency call.
  */
+let lastRun = 0;
+
 export const runSosWorkflow = async (
   userId: string,
   { type = "sos", callNumber = "100", callDelayMs = 2500 }: SosOptions = {},
 ) => {
+  // Guard against the same trigger firing from two listeners at once.
+  const now = Date.now();
+  if (now - lastRun < 10000) return;
+  lastRun = now;
+
   vibrate([300, 100, 300, 100, 600]);
 
   let lat = 0;
