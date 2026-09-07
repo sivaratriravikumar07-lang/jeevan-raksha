@@ -35,6 +35,7 @@ import MedicalID from "./pages/MedicalID";
 import DangerZones from "./pages/DangerZones";
 import SafeZones from "./pages/SafeZones";
 import Permissions from "./pages/Permissions";
+import VoiceProtection from "./pages/VoiceProtection";
 import Download from "./pages/Download";
 import NotFound from "./pages/NotFound";
 
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/danger-zones" element={<ProtectedRoute><DangerZones /></ProtectedRoute>} />
             <Route path="/safe-zones" element={<ProtectedRoute><SafeZones /></ProtectedRoute>} />
             <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
+            <Route path="/voice-protection" element={<ProtectedRoute><VoiceProtection /></ProtectedRoute>} />
             <Route path="/download" element={<Download />} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />
