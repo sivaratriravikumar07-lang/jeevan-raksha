@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, User, Save, Heart, LogOut } from "lucide-react";
+import { ArrowLeft, User, Save, Heart, LogOut, Globe, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,6 +80,17 @@ const Profile = () => {
             <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Profile"}
           </Button>
         </form>
+
+        <Link to="/settings" className="flex items-center justify-between gap-3 bg-card border border-border rounded-2xl p-4 shadow-card hover:bg-muted/60 transition-colors">
+          <span className="flex items-center gap-3">
+            <Globe className="w-5 h-5 text-primary" />
+            <span>
+              <span className="block font-semibold text-sm">Language / భాష / भाषा</span>
+              <span className="block text-xs text-muted-foreground">Settings</span>
+            </span>
+          </span>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </Link>
 
         <div className="bg-card border border-border rounded-2xl p-4 shadow-card text-xs text-muted-foreground">
           Signed in as <span className="font-mono text-foreground">{user?.email}</span>
