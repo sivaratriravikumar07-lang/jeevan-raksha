@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { NativeEmergency } from "@/components/NativeEmergency";
 import Index from "./pages/Index";
@@ -38,6 +39,7 @@ import SafeZones from "./pages/SafeZones";
 import Permissions from "./pages/Permissions";
 import VoiceProtection from "./pages/VoiceProtection";
 import Download from "./pages/Download";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +51,7 @@ const App = () => (
       <Sonner position="top-center" />
       <BrowserRouter>
         <AuthProvider>
+          <LanguageProvider>
           <NativeEmergency />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -81,10 +84,12 @@ const App = () => (
             <Route path="/safe-zones" element={<ProtectedRoute><SafeZones /></ProtectedRoute>} />
             <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
             <Route path="/voice-protection" element={<ProtectedRoute><VoiceProtection /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/download" element={<Download />} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </LanguageProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
