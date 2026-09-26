@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
-import markAsset from "@/assets/jeevan-raksha-mark.jpg.asset.json";
 
 const features = [
   { icon: Zap, title: "One-Tap SOS", desc: "Hold once — your trusted circle, police and hospitals are alerted together." },
@@ -99,7 +98,7 @@ const Index = () => {
                 <div className="absolute -inset-3 rounded-[3rem] border border-background/15" />
                 <div className="absolute -inset-1 rounded-[2.6rem] bg-gradient-to-b from-background/20 to-transparent opacity-60" />
                 <img
-                  src={markAsset.url}
+                  src="/jeevan-raksha-logo.png"
                   alt="Jeevan Raksha emblem — emergency response for women and elders"
                   className="relative w-56 h-56 sm:w-72 sm:h-72 md:w-[22rem] md:h-[22rem] object-contain rounded-[2.5rem] ring-1 ring-background/20 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7),inset_0_1px_0_hsl(var(--background)/0.25)]"
                 />
@@ -161,3 +160,4 @@ const Index = () => {
 };
 
 export default Index;
+
