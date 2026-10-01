@@ -40,6 +40,9 @@ import Permissions from "./pages/Permissions";
 import VoiceProtection from "./pages/VoiceProtection";
 import Download from "./pages/Download";
 import Settings from "./pages/Settings";
+import Volunteer from "./pages/Volunteer";
+import VolunteerHelp from "./pages/VolunteerHelp";
+import { ActiveVolunteerBanner } from "@/components/ActiveVolunteerBanner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +56,7 @@ const App = () => (
         <AuthProvider>
           <LanguageProvider>
           <NativeEmergency />
+          <ActiveVolunteerBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -85,6 +89,8 @@ const App = () => (
             <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
             <Route path="/voice-protection" element={<ProtectedRoute><VoiceProtection /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/volunteer" element={<ProtectedRoute><Volunteer /></ProtectedRoute>} />
+            <Route path="/volunteer-help/:id" element={<ProtectedRoute><VolunteerHelp /></ProtectedRoute>} />
             <Route path="/download" element={<Download />} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />

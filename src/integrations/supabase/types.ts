@@ -315,17 +315,198 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteer_requests: {
+        Row: {
+          accepted_at: string | null
+          accepted_volunteer_id: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          incident_id: string | null
+          latitude: number
+          longitude: number
+          radius_m: number
+          requester_id: string
+          status: string
+          timeout_at: string
+          updated_at: string
+          volunteer_latitude: number | null
+          volunteer_longitude: number | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_volunteer_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          incident_id?: string | null
+          latitude: number
+          longitude: number
+          radius_m?: number
+          requester_id: string
+          status?: string
+          timeout_at?: string
+          updated_at?: string
+          volunteer_latitude?: number | null
+          volunteer_longitude?: number | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_volunteer_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          incident_id?: string | null
+          latitude?: number
+          longitude?: number
+          radius_m?: number
+          requester_id?: string
+          status?: string
+          timeout_at?: string
+          updated_at?: string
+          volunteer_latitude?: number | null
+          volunteer_longitude?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_requests_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteer_responses: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          response: string
+          volunteer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          response: string
+          volunteer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          response?: string
+          volunteer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "volunteer_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteers: {
+        Row: {
+          available: boolean
+          created_at: string
+          display_name: string
+          latitude: number | null
+          longitude: number | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          available?: boolean
+          created_at?: string
+          display_name: string
+          latitude?: number | null
+          longitude?: number | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          available?: boolean
+          created_at?: string
+          display_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      count_nearby_volunteers: {
+        Args: { _request_id: string }
+        Returns: number
+      }
+      create_volunteer_request: {
+        Args: {
+          _incident_id: string
+          _lat: number
+          _lng: number
+          _radius_m?: number
+          _timeout_s?: number
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      km_between: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
+      }
+      open_requests_near_me: {
+        Args: never
+        Returns: {
+          created_at: string
+          distance_km: number
+          id: string
+          timeout_at: string
+        }[]
+      }
+      requester_info_for_request: {
+        Args: { _request_id: string }
+        Returns: {
+          first_name: string
+          phone: string
+        }[]
+      }
+      respond_volunteer_request: {
+        Args: { _accept: boolean; _request_id: string }
+        Returns: boolean
+      }
+      update_volunteer_progress: {
+        Args: {
+          _lat?: number
+          _lng?: number
+          _request_id: string
+          _status: string
+        }
+        Returns: undefined
+      }
+      volunteer_info_for_request: {
+        Args: { _request_id: string }
+        Returns: {
+          display_name: string
+          verified: boolean
+        }[]
       }
     }
     Enums: {
