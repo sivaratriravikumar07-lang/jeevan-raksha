@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { vibrate, getCurrentPosition } from "@/lib/emergency";
 import { buildEmergencyMessage, openSmsToAll, type ContactLite } from "@/lib/sms";
+import { requestNearbyVolunteers } from "@/lib/volunteers";
 
 export interface SosOptions {
   /** Incident type stored in the incidents table. */
@@ -72,6 +73,11 @@ export const runSosWorkflow = async (
       })
       .select()
       .single();
+
+    // Additive: alert nearby volunteers (non-blocking, never stops SOS).
+    void requestNearbyVolunteers(incident.data?.id ?? null, lat, lng);
+
+
 
     const { data: smsRes, error: smsErr } = await supabase.functions.invoke("send-sos-sms", {
       body: { incidentId: incident.data?.id, latitude: lat || null, longitude: lng || null },
