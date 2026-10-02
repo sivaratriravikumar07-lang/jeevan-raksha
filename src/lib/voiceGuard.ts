@@ -16,6 +16,7 @@ interface VoiceGuardPlugin {
   start(): Promise<VoiceGuardStatus>;
   stop(): Promise<VoiceGuardStatus>;
   openBatterySettings(): Promise<void>;
+  callNow(opts: { number: string }): Promise<{ direct: boolean }>;
   addListener(
     event: "voiceEmergency",
     cb: (data: { phrase: string }) => void,
@@ -43,6 +44,7 @@ const webFallback: VoiceGuardPlugin = {
   start: noop,
   stop: noop,
   openBatterySettings: async () => {},
+  callNow: async ({ number }) => { window.location.href = `tel:${number}`; return { direct: false }; },
   addListener: async () => ({ remove: async () => {} }) as PluginListenerHandle,
 };
 
