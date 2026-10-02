@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { vibrate, getCurrentPosition } from "@/lib/emergency";
 import { buildEmergencyMessage, openSmsToAll, type ContactLite } from "@/lib/sms";
 import { requestNearbyVolunteers } from "@/lib/volunteers";
+import { VoiceGuard } from "@/lib/voiceGuard";
 
 export interface SosOptions {
   /** Incident type stored in the incidents table. */
@@ -97,6 +98,8 @@ export const runSosWorkflow = async (
   }
 
   setTimeout(() => {
-    window.location.href = `tel:${callNumber}`;
+    VoiceGuard.callNow({ number: callNumber }).catch(() => {
+      window.location.href = `tel:${callNumber}`;
+    });
   }, callDelayMs);
 };

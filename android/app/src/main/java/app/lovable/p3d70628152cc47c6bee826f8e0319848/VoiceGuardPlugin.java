@@ -25,7 +25,8 @@ import com.getcapacitor.annotation.PermissionCallback;
         name = "VoiceGuard",
         permissions = {
                 @Permission(alias = "microphone", strings = {Manifest.permission.RECORD_AUDIO}),
-                @Permission(alias = "notifications", strings = {"android.permission.POST_NOTIFICATIONS"})
+                @Permission(alias = "notifications", strings = {"android.permission.POST_NOTIFICATIONS"}),
+                @Permission(alias = "phone", strings = {Manifest.permission.CALL_PHONE})
         }
 )
 public class VoiceGuardPlugin extends Plugin {
@@ -128,6 +129,33 @@ public class VoiceGuardPlugin extends Plugin {
         intent.setAction(VoiceGuardService.ACTION_STOP);
         getContext().startService(intent);
         call.resolve(statusObject());
+    }
+
+    @PluginMethod
+    public void callNow(PluginCall call) {
+        String number = call.getString("number", "112");
+        if (getPermissionState("phone") != PermissionState.GRANTED) {
+            requestPermissionForAlias("phone", call, "callPermCallback");
+            return;
+        }
+        placeCall(call, number);
+    }
+
+    @PermissionCallback
+    private void callPermCallback(PluginCall call) {
+        placeCall(call, call.getString("number", "112"));
+    }
+
+    private void placeCall(PluginCall call, String number) {
+        try {
+            boolean granted = getPermissionState("phone") == PermissionState.GRANTED;
+            Intent intent = new Intent(granted ? Intent.ACTION_CALL : Intent.ACTION_DIAL, Uri.parse("tel:" + number));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+            JSObject r = new JSObject(); r.put("direct", granted); call.resolve(r);
+        } catch (Exception e) {
+            call.reject("Call failed: " + e.getMessage());
+        }
     }
 
     @PluginMethod
