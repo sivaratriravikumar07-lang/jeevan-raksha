@@ -2,23 +2,18 @@ import { Link } from "react-router-dom";
 import { Shield, Zap, MapPin, Mic, Bell, Users, AlertTriangle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
+import { LANGUAGES, useLanguage, type LangCode } from "@/hooks/useLanguage";
 
-const features = [
-  { icon: Zap, title: "One-Tap SOS", desc: "Hold once — your trusted circle, police and hospitals are alerted together." },
-  { icon: MapPin, title: "Live GPS Stream", desc: "Your moving location shared on a live link until you're safe." },
-  { icon: Mic, title: "Voice & Sound Shield", desc: "Say \"Help Me\" or let crash/scream detection trigger it for you." },
-  { icon: Bell, title: "Auto SMS + Call 100", desc: "Location SMS to every contact, then a direct police call in 15s." },
-  { icon: Users, title: "Guardian Circle", desc: "Trips, check-in timers and geofences watched by the people you trust." },
-  { icon: Shield, title: "Responder Network", desc: "Nearest verified police stations and hospitals, live distance and ETA." },
-];
-
-const stats = [
-  { value: "15s", label: "to auto police call" },
-  { value: "24/7", label: "listening for distress" },
-  { value: "100+", label: "cities covered live" },
-];
+const featureIcons = [Zap, MapPin, Mic, Bell, Users, Shield];
 
 const Index = () => {
+  const { t, lang, setLang } = useLanguage();
+  const features = featureIcons.map((icon, i) => ({ icon, title: t(`index.f${i + 1}t`), desc: t(`index.f${i + 1}d`) }));
+  const stats = [
+    { value: "15s", label: t("index.stat1") },
+    { value: "24/7", label: t("index.stat2") },
+    { value: "100+", label: t("index.stat3") },
+  ];
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -29,8 +24,11 @@ const Index = () => {
             <span className="font-bold text-base sm:text-lg tracking-tight truncate">Jeevan Raksha</span>
           </Link>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <Link to="/auth"><Button variant="ghost" size="sm" className="px-2 sm:px-3">Login</Button></Link>
-            <Link to="/auth?mode=signup"><Button size="sm" className="px-3 bg-gradient-emergency shadow-emergency">Sign Up</Button></Link>
+            <select aria-label="Language" value={lang} onChange={(e) => setLang(e.target.value as LangCode)} className="h-8 rounded-md border border-border bg-background text-xs px-1">
+              {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.native}</option>)}
+            </select>
+            <Link to="/auth"><Button variant="ghost" size="sm" className="px-2 sm:px-3">{t("common.login")}</Button></Link>
+            <Link to="/auth?mode=signup"><Button size="sm" className="px-3 bg-gradient-emergency shadow-emergency">{t("common.signUp")}</Button></Link>
           </div>
         </div>
       </header>
@@ -52,30 +50,30 @@ const Index = () => {
           <div className="grid md:grid-cols-[1.05fr_0.95fr] gap-10 md:gap-8 items-center">
             <div className="space-y-6 order-2 md:order-1">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/25 text-[11px] font-semibold uppercase tracking-[0.18em]">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> India's Women Safety Companion
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> {t("index.badge")}
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-[1.02]">
-                Safety in
-                <span className="text-gradient-emergency"> one tap.</span>
+                {t("index.heroA")}
+                <span className="text-gradient-emergency"> {t("index.heroB")}</span>
                 <br />
-                Help in
-                <span className="text-gradient-trust"> seconds.</span>
+                {t("index.heroC")}
+                <span className="text-gradient-trust"> {t("index.heroD")}</span>
               </h1>
 
               <p className="text-base sm:text-lg text-background/70 max-w-md">
-                Real-time SOS, live GPS, voice activation and a direct line to police and hospitals — working even when you can't reach your phone.
+                {t("index.sub")}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to="/auth?mode=signup" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-gradient-emergency shadow-emergency text-base h-12 px-8">
-                    <AlertTriangle className="w-5 h-5 mr-2" /> Get Protected Now
+                    <AlertTriangle className="w-5 h-5 mr-2" /> {t("index.cta")}
                   </Button>
                 </Link>
                 <Link to="/auth" className="w-full sm:w-auto">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8 bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background">
-                    Sign In
+                    {t("common.signIn")}
                   </Button>
                 </Link>
               </div>
@@ -112,8 +110,8 @@ const Index = () => {
       {/* Features — numbered editorial list */}
       <section className="container py-16 md:py-24">
         <div className="max-w-2xl mb-10">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-3">What you get</p>
-          <h2 className="text-3xl md:text-5xl font-bold leading-tight">Built for emergencies that can't wait.</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-3">{t("index.featuresEyebrow")}</p>
+          <h2 className="text-3xl md:text-5xl font-bold leading-tight">{t("index.featuresTitle")}</h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-3xl overflow-hidden border border-border">
           {features.map((f, i) => (
@@ -134,11 +132,11 @@ const Index = () => {
         <div className="relative overflow-hidden rounded-3xl bg-gradient-trust p-8 md:p-14 shadow-trust">
           <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary/30 blur-3xl" />
           <div className="relative max-w-xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-3">Your safety, our promise.</h2>
-            <p className="text-secondary-foreground/85 mb-7">Join thousands of women using Jeevan Raksha to stay protected, every day, everywhere.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-3">{t("index.ctaTitle")}</h2>
+            <p className="text-secondary-foreground/85 mb-7">{t("index.ctaSub")}</p>
             <Link to="/auth?mode=signup">
               <Button size="lg" variant="secondary" className="h-12 px-8 bg-background text-foreground hover:bg-background/90">
-                Create Free Account <ArrowRight className="w-4 h-4 ml-2" />
+                {t("index.ctaBtn")} <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </div>
@@ -147,13 +145,14 @@ const Index = () => {
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground space-y-2">
         <div className="flex items-center justify-center gap-4">
-          <Link to="/download" className="hover:text-foreground transition-colors">Download App</Link>
+          <Link to="/download" className="hover:text-foreground transition-colors">{t("index.download")}</Link>
           <span>·</span>
-          <Link to="/safety-tips" className="hover:text-foreground transition-colors">Safety Tips</Link>
+          <Link to="/safety-tips" className="hover:text-foreground transition-colors">{t("index.safetyTips")}</Link>
           <span>·</span>
-          <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">Sign Up</Link>
+          <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">{t("common.signUp")}</Link>
         </div>
-        <div>© 2026 Jeevan Raksha · Protecting women, one tap at a time.</div>
+        <div>{t("index.rights")}</div>
+        <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
       </footer>
     </div>
   );
