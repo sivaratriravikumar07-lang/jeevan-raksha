@@ -43,6 +43,8 @@ import Settings from "./pages/Settings";
 import Volunteer from "./pages/Volunteer";
 import VolunteerHelp from "./pages/VolunteerHelp";
 import { ActiveVolunteerBanner } from "@/components/ActiveVolunteerBanner";
+import Privacy from "./pages/Privacy";
+import AdminVolunteers from "./pages/AdminVolunteers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -92,6 +94,8 @@ const App = () => (
             <Route path="/volunteer" element={<ProtectedRoute><Volunteer /></ProtectedRoute>} />
             <Route path="/volunteer-help/:id" element={<ProtectedRoute><VolunteerHelp /></ProtectedRoute>} />
             <Route path="/download" element={<Download />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/admin/volunteers" element={<ProtectedRoute><AdminVolunteers /></ProtectedRoute>} />
             <Route path="/calculator" element={<Calculator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
