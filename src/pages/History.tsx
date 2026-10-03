@@ -17,12 +17,28 @@ const statusColor: Record<string, string> = {
 const History = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<Incident[]>([]);
+  const [alerts, setAlerts] = useState<Record<string, { channel: string; recipient: string; status: string }[]>>({});
+  const [vols, setVols] = useState<Record<string, { status: string; name?: string }>>({});
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await supabase.from("incidents").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       setItems(data ?? []);
+      const ids = (data ?? []).map((d) => d.id);
+      if (!ids.length) return;
+      const { data: al } = await supabase.from("alerts").select("incident_id,channel,recipient,status").in("incident_id", ids);
+      const am: typeof alerts = {};
+      (al ?? []).forEach((a) => { (am[a.incident_id] ||= []).push(a); });
+      setAlerts(am);
+      const db = supabase as any;
+      const { data: vr } = await db.from("volunteer_requests").select("id,incident_id,status").in("incident_id", ids);
+      const vm: typeof vols = {};
+      for (const r of vr ?? []) {
+        const { data: info } = await db.rpc("volunteer_info_for_request", { _request_id: r.id });
+        vm[r.incident_id] = { status: r.status, name: info?.[0]?.display_name };
+      }
+      setVols(vm);
     })();
   }, [user]);
 
@@ -60,6 +76,18 @@ const History = () => {
                 <MapPin className="w-3 h-3" /> View location
               </a>
             )}
+            <div className="mt-3 pt-3 border-t border-border text-xs space-y-1 text-muted-foreground">
+              {i.resolved_at && <div>Resolved: {new Date(i.resolved_at).toLocaleString()}</div>}
+              <div>
+                Alerts sent: {(alerts[i.id] ?? []).length === 0 ? "none recorded" : ""}
+                {(alerts[i.id] ?? []).map((a, k) => (
+                  <span key={k} className="block text-foreground">• {a.channel.toUpperCase()} → {a.recipient} ({a.status})</span>
+                ))}
+              </div>
+              {vols[i.id] && (
+                <div>Volunteer: <span className="text-foreground">{vols[i.id].name ?? "—"}</span> ({vols[i.id].status.replace(/_/g, " ")})</div>
+              )}
+            </div>
           </div>
         ))}
       </main>

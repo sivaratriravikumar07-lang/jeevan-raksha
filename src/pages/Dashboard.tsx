@@ -372,6 +372,11 @@ const Dashboard = () => {
             <Button size="sm" variant="secondary" className="bg-background text-foreground" onClick={() => navigate("/responder")}>
               Open responder panel
             </Button>
+            {roles.includes("admin") && (
+              <Button size="sm" variant="secondary" className="bg-background text-foreground ml-2" onClick={() => navigate("/admin/volunteers")}>
+                Verify volunteers
+              </Button>
+            )}
           </div>
         )}
       </main>
