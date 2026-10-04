@@ -1,0 +1,1 @@
+- Google Maps browser key is fetched at runtime from the maps-config backend function when the build-time env var is missing, because .env is gitignored and connector vars get dropped.
